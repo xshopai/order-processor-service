@@ -38,10 +38,10 @@ RUN mvn clean package -DskipTests=true -B --no-transfer-progress \
 # -----------------------------------------------------------------------------
 FROM eclipse-temurin:21-jre-alpine AS runtime-base
 
-# Install only essential system dependencies
+# Install only essential system dependencies and wget for healthcheck
 RUN apk add --no-cache \
-    curl \
-    dumb-init && \
+    dumb-init \
+    wget && \
     rm -rf /var/cache/apk/*
 
 # Create non-root user and app directory
@@ -62,9 +62,9 @@ COPY --from=build --chown=appuser:appgroup /app/target/*.jar app.jar
 # Switch to non-root user
 USER appuser
 
-# Health check with optimized settings
+# Health check with optimized settings (using wget which is smaller than curl)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8083/api/actuator/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8083/api/actuator/health || exit 1
 
 # Expose port
 EXPOSE 8083
@@ -81,10 +81,15 @@ ENV JAVA_OPTS="-XX:+UseContainerSupport \
                -Dspring.backgroundpreinitializer.ignore=true"
 
 # Use dumb-init for proper signal handling
-ENTRYPOINT ["dumb-init", "java"]
-CMD ["-jar", "app.jar"]
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
 
-# Labels for better image management
+# Labels for better image management and security scanning
 LABEL maintainer="AIOutlet Team"
 LABEL service="order-processor-service"
 LABEL version="1.0.0"
+LABEL org.opencontainers.image.source="https://github.com/aioutlet/aioutlet"
+LABEL org.opencontainers.image.description="Order Processor Service for AIOutlet platform"
+LABEL org.opencontainers.image.vendor="AIOutlet"
+LABEL framework="spring-boot"
+LABEL language="java"
