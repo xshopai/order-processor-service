@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for Order Processor Service
+  order-processor-postgres:
+    image: postgres:16
+    container_name: order-processor-postgres
+    restart: unless-stopped
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: order_processor_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - order_processor_postgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    networks:
+      - aioutlet-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d order_processor_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Order Processor Service (Java/Spring Boot)
+  order-processor-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: order-processor-service
+    restart: unless-stopped
+    ports:
+      - "1013:1013"
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - SERVER_PORT=1013
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://order-processor-postgres:5432/order_processor_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_RABBITMQ_HOST=rabbitmq-message-broker
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=admin
+      - SPRING_RABBITMQ_PASSWORD=admin123
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+    depends_on:
+      order-processor-postgres:
+        condition: service_healthy
+    networks:
+      - aioutlet-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1013/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  order_processor_postgres_data:
+    name: order_processor_postgres_data
+
+networks:
+  aioutlet-network:
+    external: true
