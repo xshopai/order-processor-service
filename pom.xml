@@ -216,7 +216,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>10.15.0</version>
+                <version>11.18.0</version>
                 <configuration>
                     <url>jdbc:postgresql://localhost:5432/OrderProcessorDb</url>
                     <user>postgres</user>
