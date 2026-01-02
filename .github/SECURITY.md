@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Order Processor Service is a Java Spring Boot microservice implementing choreography-based saga patterns for complex order processing workflows. It coordinates order fulfillment, inventory management, payment processing, and shipping across multiple services within the AIOutlet platform.
+The Order Processor Service is a Java Spring Boot microservice implementing choreography-based saga patterns for complex order processing workflows. It coordinates order fulfillment, inventory management, payment processing, and shipping across multiple services within the xShop.ai platform.
 
 ## Supported Versions
 
@@ -351,8 +351,8 @@ DB_PASSWORD=secure-database-password
 
 # JWT Security
 JWT_SECRET=your-256-bit-jwt-secret-key
-JWT_ISSUER=AIOutlet.OrderProcessor
-JWT_AUDIENCE=AIOutlet.Platform
+JWT_ISSUER=xShop.ai.OrderProcessor
+JWT_AUDIENCE=xShop.ai.Platform
 
 # Message Queue Security
 RABBITMQ_HOST=secure-rabbitmq-server

@@ -85,11 +85,11 @@ ENTRYPOINT ["dumb-init", "--"]
 CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
 
 # Labels for better image management and security scanning
-LABEL maintainer="AIOutlet Team"
+LABEL maintainer="xShop.ai Team"
 LABEL service="order-processor-service"
 LABEL version="1.0.0"
 LABEL org.opencontainers.image.source="https://github.com/aioutlet/aioutlet"
-LABEL org.opencontainers.image.description="Order Processor Service for AIOutlet platform"
-LABEL org.opencontainers.image.vendor="AIOutlet"
+LABEL org.opencontainers.image.description="Order Processor Service for xShop.ai platform"
+LABEL org.opencontainers.image.vendor="xShop.ai"
 LABEL framework="spring-boot"
 LABEL language="java"
