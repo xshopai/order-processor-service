@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.config;
+package com.xshopai.orderprocessor.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

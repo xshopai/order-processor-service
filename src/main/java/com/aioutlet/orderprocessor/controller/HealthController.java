@@ -1,6 +1,6 @@
-package com.aioutlet.orderprocessor.controller;
+package com.xshopai.orderprocessor.controller;
 
-import com.aioutlet.orderprocessor.util.CorrelationIdUtil;
+import com.xshopai.orderprocessor.util.CorrelationIdUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

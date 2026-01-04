@@ -1,7 +1,7 @@
-package com.aioutlet.orderprocessor.controller;
+package com.xshopai.orderprocessor.controller;
 
-import com.aioutlet.orderprocessor.model.entity.OrderProcessingSaga;
-import com.aioutlet.orderprocessor.repository.OrderProcessingSagaRepository;
+import com.xshopai.orderprocessor.model.entity.OrderProcessingSaga;
+import com.xshopai.orderprocessor.repository.OrderProcessingSagaRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;

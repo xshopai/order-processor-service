@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.client;
+package com.xshopai.orderprocessor.client;
 
 import io.dapr.client.DaprClient;
 import io.dapr.client.domain.HttpExtension;

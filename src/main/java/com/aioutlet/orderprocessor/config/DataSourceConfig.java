@@ -1,6 +1,6 @@
-package com.aioutlet.orderprocessor.config;
+package com.xshopai.orderprocessor.config;
 
-import com.aioutlet.orderprocessor.client.DaprSecretManager;
+import com.xshopai.orderprocessor.client.DaprSecretManager;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

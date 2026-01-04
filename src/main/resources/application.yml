@@ -39,7 +39,7 @@ spring:
 logging:
   level:
     root: INFO
-    com.aioutlet.orderprocessor: INFO
+    com.xshopai.orderprocessor: INFO
     org.springframework: WARN
     org.hibernate: WARN
     org.flywaydb: INFO
@@ -99,7 +99,7 @@ jwt:
   algorithm: ${JWT_ALGORITHM:HS256}
   expiration-seconds: ${JWT_EXPIRATION:3600}
   issuer: ${JWT_ISSUER:auth-service}
-  audience: ${JWT_AUDIENCE:aioutlet-platform}
+  audience: ${JWT_AUDIENCE:xshopai-platform}
 
 # Saga orchestration configuration
 saga:

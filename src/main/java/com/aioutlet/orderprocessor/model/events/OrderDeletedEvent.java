@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.model.events;
+package com.xshopai.orderprocessor.model.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

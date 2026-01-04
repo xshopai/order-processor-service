@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.model.entity;
+package com.xshopai.orderprocessor.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;

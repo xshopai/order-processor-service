@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.events.consumer;
+package com.xshopai.orderprocessor.events.consumer;
 
 import io.dapr.client.domain.CloudEvent;
 import lombok.RequiredArgsConstructor;
@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.aioutlet.orderprocessor.model.events.PaymentProcessedEvent;
-import com.aioutlet.orderprocessor.model.events.PaymentFailedEvent;
-import com.aioutlet.orderprocessor.service.SagaOrchestratorService;
+import com.xshopai.orderprocessor.model.events.PaymentProcessedEvent;
+import com.xshopai.orderprocessor.model.events.PaymentFailedEvent;
+import com.xshopai.orderprocessor.service.SagaOrchestratorService;
 
 /**
  * Payment Event Consumer

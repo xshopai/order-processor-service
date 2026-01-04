@@ -1,6 +1,6 @@
-package com.aioutlet.orderprocessor.security;
+package com.xshopai.orderprocessor.security;
 
-import com.aioutlet.orderprocessor.client.DaprSecretManager;
+import com.xshopai.orderprocessor.client.DaprSecretManager;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -39,7 +39,7 @@ public class JwtService {
     @Value("${jwt.issuer:auth-service}")
     private String jwtIssuer;
     
-    @Value("${jwt.audience:aioutlet-platform}")
+    @Value("${jwt.audience:xshopai-platform}")
     private String jwtAudience;
 
     public JwtService(DaprSecretManager secretManager) {

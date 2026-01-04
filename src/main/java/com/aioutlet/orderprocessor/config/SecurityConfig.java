@@ -1,6 +1,6 @@
-package com.aioutlet.orderprocessor.config;
+package com.xshopai.orderprocessor.config;
 
-import com.aioutlet.orderprocessor.security.JwtAuthenticationFilter;
+import com.xshopai.orderprocessor.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

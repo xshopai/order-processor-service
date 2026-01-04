@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.controller;
+package com.xshopai.orderprocessor.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

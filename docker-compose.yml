@@ -16,7 +16,7 @@ services:
       - order_processor_postgres_data:/var/lib/postgresql/data
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     networks:
-      - aioutlet-network
+      - xshopai-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d order_processor_db"]
       interval: 10s
@@ -47,7 +47,7 @@ services:
       order-processor-postgres:
         condition: service_healthy
     networks:
-      - aioutlet-network
+      - xshopai-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:1013/actuator/health"]
       interval: 30s
@@ -60,5 +60,5 @@ volumes:
     name: order_processor_postgres_data
 
 networks:
-  aioutlet-network:
+  xshopai-network:
     external: true

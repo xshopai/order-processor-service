@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.aioutlet</groupId>
+    <groupId>com.xshopai</groupId>
     <artifactId>order-processor-service</artifactId>
     <version>1.0.0</version>
     <name>Order Processor Service</name>

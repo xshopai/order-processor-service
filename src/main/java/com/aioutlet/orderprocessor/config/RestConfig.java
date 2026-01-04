@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.config;
+package com.xshopai.orderprocessor.config;
 
 // Imports commented out as RestTemplate bean is currently disabled
 // import org.springframework.boot.web.client.RestTemplateBuilder;

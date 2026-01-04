@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.events.publisher;
+package com.xshopai.orderprocessor.events.publisher;
 
 import io.dapr.client.DaprClient;
 import io.dapr.client.domain.CloudEvent;

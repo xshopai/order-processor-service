@@ -1,6 +1,6 @@
 # 🔄 Order Processor Service
 
-Saga orchestration microservice for xShop.ai - implements choreography-based saga pattern for distributed order processing transactions across payment, inventory, and shipping services.
+Saga orchestration microservice for xshop.ai - implements choreography-based saga pattern for distributed order processing transactions across payment, inventory, and shipping services.
 
 ## 🚀 Quick Start
 
@@ -87,7 +87,7 @@ mvn clean install -DskipTests
 | [📘 Technical Reference](docs/TECHNICAL.md) | Architecture, security, monitoring |
 | [🤝 Contributing](docs/CONTRIBUTING.md) | Contribution guidelines and workflow |
 
-**API Documentation**: See `.dapr/README.md` for Dapr configuration and `src/main/java/com/aioutlet/orderprocessor/` for endpoint definitions.
+**API Documentation**: See `.dapr/README.md` for Dapr configuration and `src/main/java/com/xshopai/orderprocessor/` for endpoint definitions.
 
 ## ⚙️ Configuration
 

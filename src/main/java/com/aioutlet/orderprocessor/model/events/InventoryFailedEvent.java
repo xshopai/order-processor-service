@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.model.events;
+package com.xshopai.orderprocessor.model.events;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

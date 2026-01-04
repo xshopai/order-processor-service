@@ -1,11 +1,11 @@
-package com.aioutlet.orderprocessor.service;
+package com.xshopai.orderprocessor.service;
 
-import com.aioutlet.orderprocessor.events.publisher.DaprEventPublisher;
-import com.aioutlet.orderprocessor.model.entity.OrderProcessingSaga;
-import com.aioutlet.orderprocessor.model.events.OrderCreatedEvent;
-import com.aioutlet.orderprocessor.model.events.PaymentProcessedEvent;
-import com.aioutlet.orderprocessor.model.events.PaymentFailedEvent;
-import com.aioutlet.orderprocessor.repository.OrderProcessingSagaRepository;
+import com.xshopai.orderprocessor.events.publisher.DaprEventPublisher;
+import com.xshopai.orderprocessor.model.entity.OrderProcessingSaga;
+import com.xshopai.orderprocessor.model.events.OrderCreatedEvent;
+import com.xshopai.orderprocessor.model.events.PaymentProcessedEvent;
+import com.xshopai.orderprocessor.model.events.PaymentFailedEvent;
+import com.xshopai.orderprocessor.repository.OrderProcessingSagaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

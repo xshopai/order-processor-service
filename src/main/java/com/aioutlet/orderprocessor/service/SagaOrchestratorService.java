@@ -1,10 +1,10 @@
-package com.aioutlet.orderprocessor.service;
+package com.xshopai.orderprocessor.service;
 
-import com.aioutlet.orderprocessor.events.publisher.DaprEventPublisher;
-import com.aioutlet.orderprocessor.model.entity.OrderProcessingSaga;
-import com.aioutlet.orderprocessor.model.events.*;
-import com.aioutlet.orderprocessor.model.events.InventoryReservationEvent.InventoryItem;
-import com.aioutlet.orderprocessor.repository.OrderProcessingSagaRepository;
+import com.xshopai.orderprocessor.events.publisher.DaprEventPublisher;
+import com.xshopai.orderprocessor.model.entity.OrderProcessingSaga;
+import com.xshopai.orderprocessor.model.events.*;
+import com.xshopai.orderprocessor.model.events.InventoryReservationEvent.InventoryItem;
+import com.xshopai.orderprocessor.repository.OrderProcessingSagaRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

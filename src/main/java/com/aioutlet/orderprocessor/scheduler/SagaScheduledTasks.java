@@ -1,6 +1,6 @@
-package com.aioutlet.orderprocessor.scheduler;
+package com.xshopai.orderprocessor.scheduler;
 
-import com.aioutlet.orderprocessor.service.SagaOrchestratorService;
+import com.xshopai.orderprocessor.service.SagaOrchestratorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;

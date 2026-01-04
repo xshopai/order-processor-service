@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.util;
+package com.xshopai.orderprocessor.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.MDC;

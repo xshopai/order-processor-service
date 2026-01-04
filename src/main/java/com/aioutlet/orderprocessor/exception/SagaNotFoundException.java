@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.exception;
+package com.xshopai.orderprocessor.exception;
 
 /**
  * Exception thrown when a saga is not found

@@ -1,7 +1,7 @@
-package com.aioutlet.orderprocessor.service;
+package com.xshopai.orderprocessor.service;
 
-import com.aioutlet.orderprocessor.model.entity.OrderProcessingSaga;
-import com.aioutlet.orderprocessor.repository.OrderProcessingSagaRepository;
+import com.xshopai.orderprocessor.model.entity.OrderProcessingSaga;
+import com.xshopai.orderprocessor.repository.OrderProcessingSagaRepository;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;

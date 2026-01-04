@@ -1,4 +1,4 @@
-package com.aioutlet.orderprocessor.model;
+package com.xshopai.orderprocessor.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

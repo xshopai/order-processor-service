@@ -1,7 +1,7 @@
-package com.aioutlet.orderprocessor.repository;
+package com.xshopai.orderprocessor.repository;
 
-import com.aioutlet.orderprocessor.model.entity.OrderProcessingSaga;
-import com.aioutlet.orderprocessor.model.entity.OrderProcessingSaga.SagaStatus;
+import com.xshopai.orderprocessor.model.entity.OrderProcessingSaga;
+import com.xshopai.orderprocessor.model.entity.OrderProcessingSaga.SagaStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

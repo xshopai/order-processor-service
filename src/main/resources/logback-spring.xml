@@ -82,7 +82,7 @@
     </root>
 
     <!-- Application logging - only show INFO and above -->
-    <logger name="com.aioutlet.orderprocessor" level="INFO" additivity="false">
+    <logger name="com.xshopai.orderprocessor" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
         <!-- <appender-ref ref="OTEL"/> -->
