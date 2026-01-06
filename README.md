@@ -1,6 +1,6 @@
 # 🔄 Order Processor Service
 
-Saga orchestration microservice for xshop.ai - implements choreography-based saga pattern for distributed order processing transactions across payment, inventory, and shipping services.
+Saga orchestration microservice for xshopai - implements choreography-based saga pattern for distributed order processing transactions across payment, inventory, and shipping services.
 
 ## 🚀 Quick Start
 
