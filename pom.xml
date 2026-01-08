@@ -15,7 +15,7 @@
     <artifactId>order-processor-service</artifactId>
     <version>1.0.0</version>
     <name>Order Processor Service</name>
-    <description>Choreography-based saga pattern order processor for AI Outlet</description>
+    <description>Choreography-based saga pattern order processor for xshopai</description>
 
     <properties>
         <java.version>21</java.version>
