@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # Order Processor Service - PowerShell Run Script with Dapr
-# Port: 1007, Dapr HTTP: 3507, Dapr gRPC: 50007
+# Port: 8007, Dapr HTTP: 3507, Dapr gRPC: 50007
 
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Cyan
@@ -17,10 +17,10 @@ Write-Host ""
 # Kill any existing processes on ports
 Write-Host "Cleaning up existing processes..." -ForegroundColor Yellow
 
-# Kill process on port 1007 (app port)
-$process = Get-NetTCPConnection -LocalPort 1007 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
+# Kill process on port 8007 (app port)
+$process = Get-NetTCPConnection -LocalPort 8007 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
 if ($process) {
-    Write-Host "Killing process on port 1007 (PID: $process)" -ForegroundColor Yellow
+    Write-Host "Killing process on port 8007 (PID: $process)" -ForegroundColor Yellow
     Stop-Process -Id $process -Force -ErrorAction SilentlyContinue
 }
 
@@ -43,14 +43,14 @@ Start-Sleep -Seconds 2
 Write-Host ""
 Write-Host "Starting with Dapr sidecar..." -ForegroundColor Green
 Write-Host "App ID: order-processor-service" -ForegroundColor Cyan
-Write-Host "App Port: 1007" -ForegroundColor Cyan
+Write-Host "App Port: 8007" -ForegroundColor Cyan
 Write-Host "Dapr HTTP Port: 3507" -ForegroundColor Cyan
 Write-Host "Dapr gRPC Port: 50007" -ForegroundColor Cyan
 Write-Host ""
 
 dapr run `
   --app-id order-processor-service `
-  --app-port 1007 `
+  --app-port 8007 `
   --dapr-http-port 3507 `
   --dapr-grpc-port 50007 `
   --log-level error `
@@ -61,7 +61,7 @@ dapr run `
   --app-health-probe-interval 5 `
   --app-health-probe-timeout 10 `
   --app-health-threshold 2 `
-  -- mvn spring-boot:run "-Dspring-boot.run.arguments=--server.port=1007"
+  -- mvn spring-boot:run "-Dspring-boot.run.arguments=--server.port=8007"
 
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Cyan
