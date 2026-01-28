@@ -4,6 +4,7 @@ import io.dapr.client.DaprClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
@@ -11,7 +12,12 @@ import java.util.Map;
 
 /**
  * Dapr Secret Manager
- * Handles retrieving secrets from Dapr secret store
+ * Handles retrieving secrets from Dapr secret store with multi-format support.
+ * 
+ * Supports multiple secret key formats for different environments:
+ * - Local development: colon separator (database:host) via local file store
+ * - Azure Key Vault: dash separator (database-host) via Key Vault
+ * - Environment variables: underscore separator (database_host) as fallback
  */
 @Service
 @Slf4j
@@ -21,6 +27,7 @@ public class DaprSecretManager {
     private static final String SECRET_STORE_NAME = "secret-store";
 
     private final DaprClient daprClient;
+    private final Environment environment;
 
     @PostConstruct
     public void init() {
@@ -28,27 +35,73 @@ public class DaprSecretManager {
     }
 
     /**
-     * Get a specific secret by key
-     * Supports nested keys with colon separator (e.g., "jwt:secret")
+     * Get a specific secret by key with multi-format fallback.
+     * Tries multiple key formats and falls back to environment variables.
+     * 
+     * Order of precedence:
+     * 1. Dapr secret store with colon separator (database:host) - local development
+     * 2. Dapr secret store with dash separator (database-host) - Azure Key Vault
+     * 3. Environment variable with underscore separator (database_host) - ACA env vars
      */
     public String getSecret(String key) {
+        // Try colon-separated key first (local file secret store)
+        String value = tryGetDaprSecret(key);
+        if (value != null) {
+            return value;
+        }
+        
+        // Try dash-separated key (Azure Key Vault format)
+        String dashKey = key.replace(":", "-");
+        if (!dashKey.equals(key)) {
+            value = tryGetDaprSecret(dashKey);
+            if (value != null) {
+                log.debug("Found secret using dash separator: {}", dashKey);
+                return value;
+            }
+        }
+        
+        // Fall back to environment variable (underscore separator)
+        String envKey = key.replace(":", "_").replace("-", "_").toUpperCase();
+        value = environment.getProperty(envKey);
+        if (value != null) {
+            log.debug("Found secret from environment variable: {}", envKey);
+            return value;
+        }
+        
+        // Also try lowercase underscore format
+        String lowerEnvKey = key.replace(":", "_").replace("-", "_");
+        value = environment.getProperty(lowerEnvKey);
+        if (value != null) {
+            log.debug("Found secret from environment variable: {}", lowerEnvKey);
+            return value;
+        }
+        
+        log.warn("Secret not found with any key format: {} (tried: {}, {}, {}, {})", 
+            key, key, dashKey, envKey, lowerEnvKey);
+        return null;
+    }
+    
+    /**
+     * Try to get a secret from Dapr, returning null on failure
+     */
+    private String tryGetDaprSecret(String key) {
         try {
-            log.debug("Retrieving secret: {}", key);
+            log.debug("Attempting to retrieve secret from Dapr: {}", key);
             
             Map<String, String> secret = daprClient.getSecret(SECRET_STORE_NAME, key).block();
             
             if (secret == null || secret.isEmpty()) {
-                log.warn("Secret not found: {}", key);
                 return null;
             }
             
-            // Return the first value (Dapr handles nested separator automatically)
             String value = secret.values().stream().findFirst().orElse(null);
-            log.debug("Successfully retrieved secret: {}", key);
+            if (value != null) {
+                log.debug("Successfully retrieved secret: {}", key);
+            }
             return value;
         } catch (Exception e) {
-            log.error("Failed to retrieve secret: {}", key, e);
-            throw new RuntimeException("Failed to retrieve secret", e);
+            log.debug("Could not retrieve secret '{}' from Dapr: {}", key, e.getMessage());
+            return null;
         }
     }
 
