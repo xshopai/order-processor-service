@@ -91,7 +91,7 @@ else
             "SPRING_DATASOURCE_URL=$JDBC_URL" \
             "SPRING_DATASOURCE_USERNAME=orderadmin" \
             "SPRING_DATASOURCE_PASSWORD=secretref:db-password" \
-            "DAPR_HTTP_PORT=3500" \
+            "DAPR_HTTP_PORT=3507" \
         --output none
 fi
 
