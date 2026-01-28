@@ -39,8 +39,10 @@ server:
   port: 1007
 
 dapr:
-  http-port: 3507
+  http-port: 3500
 ```
+
+> **Note:** All services now use the standard Dapr ports (3500 for HTTP, 50001 for gRPC). This simplifies configuration and works consistently whether running via Docker Compose or individual service runs.
 
 ### 3. Build the Project
 

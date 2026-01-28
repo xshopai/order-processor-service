@@ -14,6 +14,7 @@ Saga orchestration microservice for xshopai - implements choreography-based saga
 ### Setup
 
 **1. Start PostgreSQL**
+
 ```bash
 # Using Docker (recommended)
 docker run -d --name order-processor-postgres -p 5432:5432 \
@@ -25,6 +26,7 @@ docker run -d --name order-processor-postgres -p 5432:5432 \
 ```
 
 **2. Clone & Build**
+
 ```bash
 git clone https://github.com/xshopai/order-processor-service.git
 cd order-processor-service
@@ -32,6 +34,7 @@ mvn clean install
 ```
 
 **3. Configure Environment**
+
 ```bash
 # Edit application.properties or create application-dev.properties
 # spring.datasource.url=jdbc:postgresql://localhost:5432/order_processor_db
@@ -40,12 +43,14 @@ mvn clean install
 ```
 
 **4. Initialize Dapr**
+
 ```bash
 # First time only
 dapr init
 ```
 
 **5. Run Service**
+
 ```bash
 # Start with Dapr (recommended)
 ./run.sh       # Linux/Mac
@@ -56,6 +61,7 @@ mvn spring-boot:run
 ```
 
 **6. Verify**
+
 ```bash
 # Check health
 curl http://localhost:8080/actuator/health
@@ -81,11 +87,11 @@ mvn clean install -DskipTests
 
 ## 📚 Documentation
 
-| Document | Description |
-|----------|-------------|
+| Document                                      | Description                             |
+| --------------------------------------------- | --------------------------------------- |
 | [📖 Developer Guide](docs/DEVELOPER_GUIDE.md) | Local setup, debugging, daily workflows |
-| [📘 Technical Reference](docs/TECHNICAL.md) | Architecture, security, monitoring |
-| [🤝 Contributing](docs/CONTRIBUTING.md) | Contribution guidelines and workflow |
+| [📘 Technical Reference](docs/TECHNICAL.md)   | Architecture, security, monitoring      |
+| [🤝 Contributing](docs/CONTRIBUTING.md)       | Contribution guidelines and workflow    |
 
 **API Documentation**: See `.dapr/README.md` for Dapr configuration and `src/main/java/com/xshopai/orderprocessor/` for endpoint definitions.
 
@@ -107,10 +113,12 @@ SPRING_DATASOURCE_PASSWORD=postgres
 JWT_SECRET=your-secret-key-min-32-characters
 
 # Dapr
-DAPR_HTTP_PORT=3510
-DAPR_GRPC_PORT=50010
+DAPR_HTTP_PORT=3500
+DAPR_GRPC_PORT=50001
 DAPR_APP_ID=order-processor-service
 ```
+
+> **Note:** All services now use the standard Dapr ports (3500 for HTTP, 50001 for gRPC). This simplifies configuration and works consistently whether running via Docker Compose or individual service runs.
 
 See [application.properties](src/main/resources/application.properties) for complete configuration options.
 
@@ -128,6 +136,7 @@ See [application.properties](src/main/resources/application.properties) for comp
 ## 🏗️ Architecture
 
 **Saga Orchestration Pattern:**
+
 ```
 Order Created → Payment → Inventory → Shipping → Order Completed
                   ↓          ↓           ↓
