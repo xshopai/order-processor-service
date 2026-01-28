@@ -49,8 +49,12 @@ PROJECT_NAME="xshopai"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SERVICE_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
 APP_PORT=1007
-DAPR_HTTP_PORT=3507
-DAPR_PUBSUB_NAME="event-bus"
+
+# Dapr configuration for Azure Container Apps
+# In ACA, Dapr sidecar ALWAYS runs on port 3500 (HTTP) and 50001 (gRPC)
+DAPR_HTTP_PORT=3500
+DAPR_GRPC_PORT=50001
+DAPR_PUBSUB_NAME="pubsub"
 DATABASE_NAME="order_processor_db"
 
 # Parse command line arguments

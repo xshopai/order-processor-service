@@ -92,7 +92,9 @@ try {
             "SPRING_DATASOURCE_URL=$JdbcUrl" `
             "SPRING_DATASOURCE_USERNAME=pgadmin" `
             "SPRING_DATASOURCE_PASSWORD=secretref:db-password" `
-            "DAPR_HTTP_PORT=3507" `
+            "DAPR_HTTP_PORT=3500" `
+            "DAPR_GRPC_PORT=50001" `
+            "DAPR_PUBSUB_NAME=pubsub" `
         --output none
     Write-Success "Container app created"
 }

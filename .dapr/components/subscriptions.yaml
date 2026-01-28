@@ -6,7 +6,7 @@ spec:
   topic: order.created
   routes:
     default: /dapr/events/order-created
-  pubsubname: event-bus
+  pubsubname: pubsub
   deadLetterTopic: order.created.deadletter
 scopes:
   - order-processor-service
@@ -19,7 +19,7 @@ spec:
   topic: payment.processed
   routes:
     default: /dapr/events/payment-processed
-  pubsubname: event-bus
+  pubsubname: pubsub
   deadLetterTopic: payment.processed.deadletter
 scopes:
   - order-processor-service
@@ -32,7 +32,7 @@ spec:
   topic: payment.failed
   routes:
     default: /dapr/events/payment-failed
-  pubsubname: event-bus
+  pubsubname: pubsub
   deadLetterTopic: payment.failed.deadletter
 scopes:
   - order-processor-service
@@ -45,7 +45,7 @@ spec:
   topic: inventory.reserved
   routes:
     default: /dapr/events/inventory-reserved
-  pubsubname: event-bus
+  pubsubname: pubsub
   deadLetterTopic: inventory.reserved.deadletter
 scopes:
   - order-processor-service
@@ -58,7 +58,7 @@ spec:
   topic: inventory.failed
   routes:
     default: /dapr/events/inventory-failed
-  pubsubname: event-bus
+  pubsubname: pubsub
   deadLetterTopic: inventory.failed.deadletter
 scopes:
   - order-processor-service
@@ -71,7 +71,7 @@ spec:
   topic: shipping.prepared
   routes:
     default: /dapr/events/shipping-prepared
-  pubsubname: event-bus
+  pubsubname: pubsub
   deadLetterTopic: shipping.prepared.deadletter
 scopes:
   - order-processor-service
@@ -84,7 +84,7 @@ spec:
   topic: shipping.failed
   routes:
     default: /dapr/events/shipping-failed
-  pubsubname: event-bus
+  pubsubname: pubsub
   deadLetterTopic: shipping.failed.deadletter
 scopes:
   - order-processor-service

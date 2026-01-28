@@ -76,10 +76,10 @@ application:
 # Dapr configuration
 dapr:
   host: ${DAPR_HOST:localhost}
-  http-port: ${DAPR_HTTP_PORT:3507}
-  grpc-port: ${DAPR_GRPC_PORT:50007}
+  http-port: ${DAPR_HTTP_PORT:3500}
+  grpc-port: ${DAPR_GRPC_PORT:50001}
   app-id: ${DAPR_APP_ID:order-processor-service}
-  pubsub-name: ${DAPR_PUBSUB_NAME:event-bus}
+  pubsub-name: pubsub
 
 # Service invocation via Dapr (app-id based, not URLs)
 services:

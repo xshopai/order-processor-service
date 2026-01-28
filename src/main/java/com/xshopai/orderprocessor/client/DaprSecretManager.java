@@ -24,7 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DaprSecretManager {
 
-    private static final String SECRET_STORE_NAME = "secret-store";
+    private static final String SECRET_STORE_NAME = "secretstore";
 
     private final DaprClient daprClient;
     private final Environment environment;

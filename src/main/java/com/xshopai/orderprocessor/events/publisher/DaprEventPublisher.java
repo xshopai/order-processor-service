@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DaprEventPublisher {
 
-    @Value("${dapr.pubsub-name:order-pubsub}")
+    @Value("${dapr.pubsub-name:pubsub}")
     private String pubsubName;
 
     private final DaprClient daprClient;
