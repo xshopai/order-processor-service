@@ -1,0 +1,41 @@
+# Order Processor Service - Local Configuration (without Dapr)
+# Usage: Set SPRING_PROFILES_ACTIVE=local
+
+# Messaging - Direct RabbitMQ connection
+messaging:
+  provider: rabbitmq
+
+# RabbitMQ Configuration
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: guest
+  password: guest
+  virtual-host: /
+  exchange: order-processor-events
+  queue: order-processor-queue
+
+# JWT Configuration (required for non-Dapr mode)
+jwt:
+  secret: 8tDBDMcpxroHoHjXjk8xp/uAn8rzD4y8ZZremFkC4gI=
+  issuer: auth-service
+  audience: xshopai-platform
+
+# Service Tokens (for service-to-service communication)
+service-tokens:
+  order-service: svc-order-service-4ff5876fc86cc45a18d88e5d
+  inventory-service: svc-inventory-service-4ff5876fc86cc45a18d88e5d
+  payment-service: svc-payment-service-4ff5876fc86cc45a18d88e5d
+  notification-service: svc-notification-service-4ff5876fc86cc45a18d88e5d
+  web-bff: svc-web-bff-4ff5876fc86cc45a18d88e5d
+
+# Database - Direct connection (no Dapr secrets)
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/OrderProcessorDb
+    username: postgres
+    password: password
+
+logging:
+  level:
+    com.xshopai.orderprocessor: DEBUG

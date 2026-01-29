@@ -1,6 +1,10 @@
 # Order Processor Service Configuration
 # Dapr-only architecture: Messaging, secrets, tracing, and service invocation handled by Dapr
 
+# Messaging Configuration
+messaging:
+  provider: ${MESSAGING_PROVIDER:rabbitmq}
+
 spring:
   application:
     name: order-processor-service

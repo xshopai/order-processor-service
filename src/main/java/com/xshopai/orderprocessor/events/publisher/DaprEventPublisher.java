@@ -1,10 +1,8 @@
 package com.xshopai.orderprocessor.events.publisher;
 
-import io.dapr.client.DaprClient;
-import io.dapr.client.domain.CloudEvent;
+import com.xshopai.orderprocessor.messaging.MessagingProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
@@ -12,45 +10,58 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Dapr Event Publisher Service
- * Handles publishing events to Dapr pub/sub component
+ * Event Publisher Service
+ * Handles publishing events using the configured MessagingProvider
+ * 
+ * This class provides a high-level API for publishing domain events.
+ * The underlying messaging implementation (Dapr, RabbitMQ, Service Bus) 
+ * is abstracted by the MessagingProvider interface.
+ * 
+ * Note: Class name kept as DaprEventPublisher for backward compatibility,
+ * but now uses the MessagingProvider abstraction internally.
  */
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class DaprEventPublisher {
 
-    @Value("${dapr.pubsub-name:pubsub}")
-    private String pubsubName;
-
-    private final DaprClient daprClient;
+    private final MessagingProvider messagingProvider;
 
     @PostConstruct
     public void init() {
-        log.info("Dapr Event Publisher initialized with pubsub: {}", pubsubName);
+        log.info("Event Publisher initialized with provider: {}", messagingProvider.getProviderName());
     }
 
     /**
      * Publish an event to a specific topic
      */
     public void publishEvent(String topic, Object event) {
-        publishEvent(topic, event, null);
+        publishEvent(topic, event, (Map<String, String>) null);
     }
 
     /**
      * Publish an event with metadata
+     * Note: Metadata is included in the event payload for non-Dapr providers
      */
     public void publishEvent(String topic, Object event, Map<String, String> metadata) {
         try {
             log.debug("Publishing event to topic: {}", topic);
             
-            if (metadata == null) {
-                metadata = new HashMap<>();
+            String correlationId = null;
+            if (metadata != null) {
+                correlationId = metadata.get("correlationId");
+                if (correlationId == null) {
+                    correlationId = metadata.get("X-Correlation-Id");
+                }
             }
             
-            daprClient.publishEvent(pubsubName, topic, event, metadata).block();
+            boolean success = messagingProvider.publishEvent(topic, event, correlationId);
             
-            log.info("Event published successfully to topic: {}", topic);
+            if (success) {
+                log.info("Event published successfully to topic: {}", topic);
+            } else {
+                log.warn("Event publishing returned false for topic: {}", topic);
+            }
         } catch (Exception e) {
             log.error("Failed to publish event to topic: {}", topic, e);
             throw new RuntimeException("Failed to publish event", e);
@@ -61,10 +72,20 @@ public class DaprEventPublisher {
      * Publish event with correlation ID
      */
     public void publishEventWithCorrelationId(String topic, Object event, String correlationId) {
-        Map<String, String> metadata = new HashMap<>();
-        metadata.put("correlationId", correlationId);
-        metadata.put("X-Correlation-Id", correlationId);
-        publishEvent(topic, event, metadata);
+        try {
+            log.debug("Publishing event to topic: {} with correlationId: {}", topic, correlationId);
+            
+            boolean success = messagingProvider.publishEvent(topic, event, correlationId);
+            
+            if (success) {
+                log.info("Event published successfully to topic: {} with correlationId: {}", topic, correlationId);
+            } else {
+                log.warn("Event publishing returned false for topic: {} with correlationId: {}", topic, correlationId);
+            }
+        } catch (Exception e) {
+            log.error("Failed to publish event to topic: {} with correlationId: {}", topic, correlationId, e);
+            throw new RuntimeException("Failed to publish event", e);
+        }
     }
 
     // Order Events

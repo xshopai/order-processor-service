@@ -114,22 +114,20 @@ print_header "Environment Selection"
 if [ -z "$ENVIRONMENT" ]; then
     echo "Available environments:"
     echo "  1) dev (development)"
-    echo "  2) staging"
-    echo "  3) prod (production)"
+    echo "  2) prod (production)"
     echo ""
-    read -p "Select environment (1-3): " ENV_CHOICE
+    read -p "Select environment (1-2): " ENV_CHOICE
     case $ENV_CHOICE in
         1) ENVIRONMENT="dev" ;;
-        2) ENVIRONMENT="staging" ;;
-        3) ENVIRONMENT="prod" ;;
+        2) ENVIRONMENT="prod" ;;
         *) print_error "Invalid selection"; exit 1 ;;
     esac
 fi
 
 # Validate environment
-if [[ ! "$ENVIRONMENT" =~ ^(dev|staging|prod)$ ]]; then
+if [[ ! "$ENVIRONMENT" =~ ^(dev|prod)$ ]]; then
     print_error "Invalid environment: $ENVIRONMENT"
-    echo "Valid environments: dev, staging, prod"
+    echo "Valid environments: dev, prod"
     exit 1
 fi
 
@@ -141,13 +139,6 @@ case $ENVIRONMENT in
         LOG_LEVEL="DEBUG"
         MIN_REPLICAS=1
         MAX_REPLICAS=2
-        CPU_CORES="0.5"
-        MEMORY="1.0Gi"
-        ;;
-    staging)
-        LOG_LEVEL="INFO"
-        MIN_REPLICAS=1
-        MAX_REPLICAS=3
         CPU_CORES="0.5"
         MEMORY="1.0Gi"
         ;;
@@ -196,10 +187,14 @@ POSTGRES_SERVER="psql-${PROJECT_NAME}-${ENVIRONMENT}-${SUFFIX}"
 KEY_VAULT="kv-${PROJECT_NAME}-${ENVIRONMENT}-${SUFFIX}"
 MANAGED_IDENTITY="id-${PROJECT_NAME}-${ENVIRONMENT}-${SUFFIX}"
 
+# Container App name follows convention: ca-{service}-{env}-{suffix}
+CONTAINER_APP_NAME="ca-${SERVICE_NAME}-${ENVIRONMENT}-${SUFFIX}"
+
 print_info "Derived resource names:"
 echo "   Resource Group:      $RESOURCE_GROUP"
 echo "   Container Registry:  $ACR_NAME"
 echo "   Container Env:       $CONTAINER_ENV"
+echo "   Container App:       $CONTAINER_APP_NAME"
 echo "   PostgreSQL Server:   $POSTGRES_SERVER"
 echo "   Key Vault:           $KEY_VAULT"
 echo ""
@@ -264,31 +259,34 @@ print_success "Managed Identity exists: $IDENTITY_CLIENT_ID"
 # ============================================================================
 print_header "Retrieving Configuration from Key Vault"
 
-# Get PostgreSQL credentials
-POSTGRES_USER=$(az keyvault secret show --vault-name "$KEY_VAULT" --name "database-user" --query "value" -o tsv 2>/dev/null || echo "")
-POSTGRES_PASSWORD=$(az keyvault secret show --vault-name "$KEY_VAULT" --name "database-password" --query "value" -o tsv 2>/dev/null || echo "")
+# Get PostgreSQL connection string (server-level, parse credentials from it)
+print_info "Retrieving PostgreSQL connection from Key Vault..."
+POSTGRES_CONNECTION=$(az keyvault secret show --vault-name "$KEY_VAULT" --name "xshopai-postgres-server-connection" --query "value" -o tsv 2>/dev/null || echo "")
 
-if [ -z "$POSTGRES_USER" ] || [ -z "$POSTGRES_PASSWORD" ]; then
-    print_warning "PostgreSQL credentials not found in Key Vault. Trying alternate secret names..."
-    # Try alternate names (postgres-user, postgres-password)
-    POSTGRES_USER=$(az keyvault secret show --vault-name "$KEY_VAULT" --name "postgres-user" --query "value" -o tsv 2>/dev/null || echo "pgadmin")
-    POSTGRES_PASSWORD=$(az keyvault secret show --vault-name "$KEY_VAULT" --name "postgres-password" --query "value" -o tsv 2>/dev/null || echo "")
+if [ -n "$POSTGRES_CONNECTION" ]; then
+    # Parse credentials from JDBC URL: jdbc:postgresql://host:5432/?sslmode=require&user=xxx&password=xxx
+    POSTGRES_USER=$(echo "$POSTGRES_CONNECTION" | grep -oP 'user=\K[^&]+' || echo "")
+    POSTGRES_PASSWORD=$(echo "$POSTGRES_CONNECTION" | grep -oP 'password=\K[^&]+' || echo "")
+    print_success "Retrieved PostgreSQL credentials from connection string"
+else
+    print_error "PostgreSQL connection string not found in Key Vault"
+    echo "Expected secret: xshopai-postgres-server-connection"
+    exit 1
 fi
 
 if [ -z "$POSTGRES_PASSWORD" ]; then
-    print_error "PostgreSQL password not found in Key Vault"
-    echo "Expected secrets: database-password or postgres-password"
+    print_error "PostgreSQL password not found in connection string"
     exit 1
 fi
 
 print_success "Retrieved PostgreSQL credentials"
 
-# Build JDBC URL
+# Build JDBC URL with database name
 JDBC_URL="jdbc:postgresql://${POSTGRES_HOST}:5432/${DATABASE_NAME}?sslmode=require"
 print_info "JDBC URL: jdbc:postgresql://${POSTGRES_HOST}:5432/${DATABASE_NAME}?sslmode=require"
 
 # Get JWT secret (optional)
-JWT_SECRET=$(az keyvault secret show --vault-name "$KEY_VAULT" --name "jwt-secret" --query "value" -o tsv 2>/dev/null || echo "")
+JWT_SECRET=$(az keyvault secret show --vault-name "$KEY_VAULT" --name "xshopai-jwt-secret" --query "value" -o tsv 2>/dev/null || echo "")
 
 # ============================================================================
 # Create Database
@@ -435,21 +433,22 @@ if [ -n "$JWT_SECRET" ]; then
 fi
 
 # Check if container app exists
-if az containerapp show --name "$SERVICE_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
-    print_info "Container app '$SERVICE_NAME' exists, updating..."
+if az containerapp show --name "$CONTAINER_APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
+    print_info "Container app '$CONTAINER_APP_NAME' exists, updating..."
     az containerapp update \
-        --name "$SERVICE_NAME" \
+        --name "$CONTAINER_APP_NAME" \
         --resource-group "$RESOURCE_GROUP" \
         --image "$IMAGE_TAG" \
         --set-env-vars "${ENV_VARS[@]}" \
         --output none
     print_success "Container app updated"
 else
-    print_info "Creating container app '$SERVICE_NAME'..."
+    print_info "Creating container app '$CONTAINER_APP_NAME'..."
     
     # Build the create command
     MSYS_NO_PATHCONV=1 az containerapp create \
-        --name "$SERVICE_NAME" \
+        --name "$CONTAINER_APP_NAME" \
+        --container-name "$SERVICE_NAME" \
         --resource-group "$RESOURCE_GROUP" \
         --environment "$CONTAINER_ENV" \
         --image "$IMAGE_TAG" \
@@ -457,7 +456,7 @@ else
         --registry-username "$ACR_NAME" \
         --registry-password "$ACR_PASSWORD" \
         --target-port $APP_PORT \
-        --ingress internal \
+        --ingress external \
         --min-replicas $MIN_REPLICAS \
         --max-replicas $MAX_REPLICAS \
         --cpu $CPU_CORES \
@@ -493,7 +492,7 @@ print_success "Dapr configuration verified"
 print_header "Step 5: Verifying Deployment"
 
 # Get the app URL
-APP_URL=$(az containerapp show --name "$SERVICE_NAME" --resource-group "$RESOURCE_GROUP" --query "properties.configuration.ingress.fqdn" -o tsv 2>/dev/null)
+APP_URL=$(az containerapp show --name "$CONTAINER_APP_NAME" --resource-group "$RESOURCE_GROUP" --query "properties.configuration.ingress.fqdn" -o tsv 2>/dev/null)
 
 print_info "Waiting for deployment to stabilize (30 seconds)..."
 sleep 30
@@ -519,10 +518,10 @@ echo ""
 echo "Service URL: https://$APP_URL"
 echo ""
 echo "Useful commands:"
-echo -e "   View logs:         ${BLUE}az containerapp logs show --name $SERVICE_NAME --resource-group $RESOURCE_GROUP --follow${NC}"
-echo -e "   Check status:      ${BLUE}az containerapp show --name $SERVICE_NAME --resource-group $RESOURCE_GROUP --query properties.runningStatus${NC}"
-echo -e "   View revisions:    ${BLUE}az containerapp revision list --name $SERVICE_NAME --resource-group $RESOURCE_GROUP -o table${NC}"
-echo -e "   View Dapr logs:    ${BLUE}az containerapp logs show --name $SERVICE_NAME --resource-group $RESOURCE_GROUP --container daprd --follow${NC}"
+echo -e "   View logs:         ${BLUE}az containerapp logs show --name $CONTAINER_APP_NAME --resource-group $RESOURCE_GROUP --follow${NC}"
+echo -e "   Check status:      ${BLUE}az containerapp show --name $CONTAINER_APP_NAME --resource-group $RESOURCE_GROUP --query properties.runningStatus${NC}"
+echo -e "   View revisions:    ${BLUE}az containerapp revision list --name $CONTAINER_APP_NAME --resource-group $RESOURCE_GROUP -o table${NC}"
+echo -e "   View Dapr logs:    ${BLUE}az containerapp logs show --name $CONTAINER_APP_NAME --resource-group $RESOURCE_GROUP --container daprd --follow${NC}"
 echo ""
 echo "Health endpoints:"
 echo -e "   Liveness:          https://$APP_URL/actuator/health/liveness"

@@ -1,0 +1,19 @@
+# Order Processor Service - Dapr Configuration
+# Usage: Set SPRING_PROFILES_ACTIVE=dapr
+
+# Messaging - Via Dapr pub/sub
+messaging:
+  provider: dapr
+
+# Dapr Configuration
+dapr:
+  enabled: true
+  http-port: 3500
+  grpc-port: 50001
+  pubsub-name: pubsub
+  app-id: order-processor-service
+  secret-store-name: secretstore
+
+logging:
+  level:
+    com.xshopai.orderprocessor: INFO
