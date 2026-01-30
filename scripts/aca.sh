@@ -48,7 +48,7 @@ SERVICE_NAME="order-processor-service"
 PROJECT_NAME="xshopai"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SERVICE_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
-APP_PORT=1007
+APP_PORT=8007
 
 # Dapr configuration for Azure Container Apps
 # In ACA, Dapr sidecar ALWAYS runs on port 3500 (HTTP) and 50001 (gRPC)
@@ -355,8 +355,9 @@ echo "   - PostgreSQL:      $POSTGRES_HOST"
 echo "   - Database Name:   $DATABASE_NAME"
 echo ""
 
-read -p "Do you want to proceed with deployment? (y/N): " CONFIRM
-if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+read -p "Do you want to proceed with deployment? (Y/n): " CONFIRM
+CONFIRM=${CONFIRM:-Y}
+if [[ "$CONFIRM" =~ ^[Nn]$ ]]; then
     print_warning "Deployment cancelled by user"
     exit 0
 fi

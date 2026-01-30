@@ -73,8 +73,6 @@ EXPOSE 8007
 ENV JAVA_OPTS="-XX:+UseContainerSupport \
                -XX:MaxRAMPercentage=75.0 \
                -XX:+UseG1GC \
-               -XX:+UnlockExperimentalVMOptions \
-               -XX:+UseJVMCICompiler \
                -Xss256k \
                -XX:ReservedCodeCacheSize=128m \
                -Djava.security.egd=file:/dev/./urandom \
