@@ -137,10 +137,10 @@ print_success "Environment: $ENVIRONMENT"
 case $ENVIRONMENT in
     dev)
         LOG_LEVEL="DEBUG"
-        MIN_REPLICAS=1
-        MAX_REPLICAS=2
-        CPU_CORES="0.5"
-        MEMORY="1.0Gi"
+        MIN_REPLICAS=2
+        MAX_REPLICAS=5
+        CPU_CORES="1.0"
+        MEMORY="2.0Gi"
         ;;
     prod)
         LOG_LEVEL="WARN"
@@ -467,6 +467,7 @@ else
         --dapr-app-port $APP_PORT \
         --env-vars "${ENV_VARS[@]}" \
         ${IDENTITY_ID:+--user-assigned "$IDENTITY_ID"} \
+        --tags "project=$PROJECT_NAME" "environment=$ENVIRONMENT" "suffix=$SUFFIX" "service=$SERVICE_NAME" \
         --output none
 
     print_success "Container app created"
