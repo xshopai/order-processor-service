@@ -1,6 +1,7 @@
 package com.xshopai.orderprocessor.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +24,7 @@ public class OperationalController {
     /**
      * Home endpoint - welcome message
      */
-    @GetMapping("/")
+    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> home() {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Welcome to the Order Processor Service");
@@ -36,7 +37,7 @@ public class OperationalController {
     /**
      * Version endpoint
      */
-    @GetMapping("/version")
+    @GetMapping(value = "/version", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> version() {
         Map<String, Object> response = new HashMap<>();
         response.put("version", System.getProperty("api.version", "1.0.0"));
@@ -49,7 +50,7 @@ public class OperationalController {
     /**
      * Basic health check endpoint
      */
-    @GetMapping("/health")
+    @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> health() {
         Map<String, Object> health = new HashMap<>();
         health.put("status", "healthy");
@@ -63,7 +64,7 @@ public class OperationalController {
     /**
      * Readiness probe - check if service is ready to serve traffic
      */
-    @GetMapping("/readiness")
+    @GetMapping(value = "/readiness", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> readiness() {
         try {
             // Add more sophisticated checks here (DB connectivity, message broker, etc.)
@@ -97,7 +98,7 @@ public class OperationalController {
     /**
      * Liveness probe - check if the app is running
      */
-    @GetMapping("/liveness")
+    @GetMapping(value = "/liveness", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> liveness() {
         RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
         double uptimeSeconds = runtimeBean.getUptime() / 1000.0;
@@ -114,7 +115,7 @@ public class OperationalController {
     /**
      * Basic metrics endpoint
      */
-    @GetMapping("/metrics")
+    @GetMapping(value = "/metrics", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> metrics() {
         RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
         MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();

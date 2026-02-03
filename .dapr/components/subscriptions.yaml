@@ -7,9 +7,6 @@ spec:
   routes:
     default: /dapr/events/order-created
   pubsubname: pubsub
-  deadLetterTopic: order.created.deadletter
-scopes:
-  - order-processor-service
 ---
 apiVersion: dapr.io/v2alpha1
 kind: Subscription
@@ -20,9 +17,6 @@ spec:
   routes:
     default: /dapr/events/payment-processed
   pubsubname: pubsub
-  deadLetterTopic: payment.processed.deadletter
-scopes:
-  - order-processor-service
 ---
 apiVersion: dapr.io/v2alpha1
 kind: Subscription
@@ -33,9 +27,6 @@ spec:
   routes:
     default: /dapr/events/payment-failed
   pubsubname: pubsub
-  deadLetterTopic: payment.failed.deadletter
-scopes:
-  - order-processor-service
 ---
 apiVersion: dapr.io/v2alpha1
 kind: Subscription
@@ -46,9 +37,6 @@ spec:
   routes:
     default: /dapr/events/inventory-reserved
   pubsubname: pubsub
-  deadLetterTopic: inventory.reserved.deadletter
-scopes:
-  - order-processor-service
 ---
 apiVersion: dapr.io/v2alpha1
 kind: Subscription
@@ -59,9 +47,6 @@ spec:
   routes:
     default: /dapr/events/inventory-failed
   pubsubname: pubsub
-  deadLetterTopic: inventory.failed.deadletter
-scopes:
-  - order-processor-service
 ---
 apiVersion: dapr.io/v2alpha1
 kind: Subscription
@@ -72,9 +57,6 @@ spec:
   routes:
     default: /dapr/events/shipping-prepared
   pubsubname: pubsub
-  deadLetterTopic: shipping.prepared.deadletter
-scopes:
-  - order-processor-service
 ---
 apiVersion: dapr.io/v2alpha1
 kind: Subscription
@@ -85,6 +67,3 @@ spec:
   routes:
     default: /dapr/events/shipping-failed
   pubsubname: pubsub
-  deadLetterTopic: shipping.failed.deadletter
-scopes:
-  - order-processor-service

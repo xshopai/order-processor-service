@@ -5,6 +5,7 @@ import com.xshopai.orderprocessor.repository.OrderProcessingSagaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,7 @@ import java.util.UUID;
  * Admin API endpoints for the Order Processor Service
  */
 @RestController
-@RequestMapping("/api/v1/admin/sagas")
+@RequestMapping(value = "/api/v1/admin/sagas", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class AdminController {
 

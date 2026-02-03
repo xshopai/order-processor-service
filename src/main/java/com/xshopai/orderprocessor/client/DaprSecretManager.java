@@ -35,49 +35,49 @@ public class DaprSecretManager {
     }
 
     /**
-     * Get a specific secret by key with multi-format fallback.
-     * Tries multiple key formats and falls back to environment variables.
+     * Get a specific secret by key with environment variable priority.
      * 
-     * Order of precedence:
-     * 1. Dapr secret store with colon separator (database:host) - local development
-     * 2. Dapr secret store with dash separator (database-host) - Azure Key Vault
-     * 3. Environment variable with underscore separator (database_host) - ACA env vars
+     * Priority (for Azure deployment):
+     * 1. Environment variable (UPPER_SNAKE_CASE) - injected from Key Vault at deployment
+     * 2. Spring Environment property
+     * 
+     * Fallback (for local development):
+     * 3. Dapr secret store with colon separator (database:host)
+     * 
+     * Note: In Azure, secrets are injected as env vars during deployment.
+     * Dapr secretstore in Azure connects to Key Vault which doesn't allow underscores.
      */
     public String getSecret(String key) {
-        // Try colon-separated key first (local file secret store)
-        String value = tryGetDaprSecret(key);
-        if (value != null) {
+        // 1. Try environment variable FIRST (Azure deployment)
+        String envKey = key.replace(":", "_").replace("-", "_").toUpperCase();
+        String value = System.getenv(envKey);
+        if (value != null && !value.isEmpty()) {
+            log.debug("Found secret from environment variable: {}", envKey);
             return value;
         }
         
-        // Try dash-separated key (Azure Key Vault format)
-        String dashKey = key.replace(":", "-");
-        if (!dashKey.equals(key)) {
-            value = tryGetDaprSecret(dashKey);
-            if (value != null) {
-                log.debug("Found secret using dash separator: {}", dashKey);
-                return value;
-            }
-        }
-        
-        // Fall back to environment variable (underscore separator)
-        String envKey = key.replace(":", "_").replace("-", "_").toUpperCase();
+        // 2. Try Spring Environment property
         value = environment.getProperty(envKey);
-        if (value != null) {
-            log.debug("Found secret from environment variable: {}", envKey);
+        if (value != null && !value.isEmpty()) {
+            log.debug("Found secret from Spring environment: {}", envKey);
             return value;
         }
         
         // Also try lowercase underscore format
         String lowerEnvKey = key.replace(":", "_").replace("-", "_");
         value = environment.getProperty(lowerEnvKey);
-        if (value != null) {
-            log.debug("Found secret from environment variable: {}", lowerEnvKey);
+        if (value != null && !value.isEmpty()) {
+            log.debug("Found secret from Spring environment: {}", lowerEnvKey);
             return value;
         }
         
-        log.warn("Secret not found with any key format: {} (tried: {}, {}, {}, {})", 
-            key, key, dashKey, envKey, lowerEnvKey);
+        // 3. Fallback to Dapr secret store (local development only)
+        value = tryGetDaprSecret(key);
+        if (value != null) {
+            return value;
+        }
+        
+        log.warn("Secret not found: {} (tried env: {}, Spring, and Dapr)", key, envKey);
         return null;
     }
     
