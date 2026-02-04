@@ -1,6 +1,15 @@
 # Order Processor Service - Dapr Configuration
 # Usage: Set SPRING_PROFILES_ACTIVE=dapr
 
+server:
+  port: 8007
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5435/order_processor_db
+    username: postgres
+    password: postgres
+
 # Messaging - Via Dapr pub/sub
 messaging:
   provider: dapr
@@ -8,12 +17,13 @@ messaging:
 # Dapr Configuration
 dapr:
   enabled: true
-  http-port: 3500
-  grpc-port: 50001
+  http-port: 3507
+  grpc-port: 50007
   pubsub-name: pubsub
   app-id: order-processor-service
   secret-store-name: secretstore
 
 logging:
   level:
-    com.xshopai.orderprocessor: INFO
+    com.xshopai.orderprocessor: DEBUG
+    org.springframework.web: DEBUG
