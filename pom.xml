@@ -129,6 +129,16 @@
             <version>${micrometer.version}</version>
         </dependency>
 
+        <!-- OpenTelemetry Tracing with Zipkin -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-otel</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-zipkin</artifactId>
+        </dependency>
+
         <!-- Logstash encoder for JSON logging -->
         <dependency>
             <groupId>net.logstash.logback</groupId>

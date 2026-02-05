@@ -63,6 +63,17 @@ management:
   health:
     db:
       enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      type: w3c
+
+# OpenTelemetry Tracing
+management.zipkin.tracing:
+  endpoint: ${OTEL_EXPORTER_ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}
+
+spring.application.name: ${OTEL_SERVICE_NAME:order-processor-service}
 
 # Server configuration
 server:
