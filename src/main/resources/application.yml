@@ -7,7 +7,7 @@ messaging:
 
 spring:
   application:
-    name: order-processor-service
+    name: ${OTEL_SERVICE_NAME:order-processor-service}
 
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:development}
@@ -63,7 +63,23 @@ management:
   health:
     db:
       enabled: true
+  # =============================================================================
+  # OpenTelemetry Tracing Configuration (Spring Boot)
+  # =============================================================================
+  # Set via environment variables:
+  #   Option 1 - Zipkin:
+  #     OTEL_TRACES_EXPORTER=zipkin
+  #     OTEL_EXPORTER_ZIPKIN_ENDPOINT=http://localhost:9411/api/v2/spans
+  #   Option 2 - OTLP:
+  #     OTEL_TRACES_EXPORTER=otlp
+  #     OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+  #   Option 3 - Azure: Use Azure Application Insights Java agent or OTLP
+  #     -javaagent:applicationinsights-agent.jar
+  #   Option 4 - Disable:
+  #     TRACING_ENABLED=false
+  # =============================================================================
   tracing:
+    enabled: ${TRACING_ENABLED:true}
     sampling:
       probability: 1.0
     propagation:
@@ -71,10 +87,9 @@ management:
   zipkin:
     tracing:
       endpoint: ${OTEL_EXPORTER_ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}
-
-spring:
-  application:
-    name: ${OTEL_SERVICE_NAME:order-processor-service}
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
 
 # Server configuration
 server:
