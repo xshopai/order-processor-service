@@ -82,6 +82,10 @@ public class MessagingProviderFactory {
                 if (!"dapr".equals(provider)) {
                     log.warn("Unknown messaging provider '{}', falling back to 'dapr'", provider);
                 }
+                if (daprClient == null) {
+                    log.error("DaprClient not available but messaging provider is set to 'dapr'. Check MESSAGING_PROVIDER environment variable.");
+                    throw new IllegalStateException("DaprClient bean not found. Set MESSAGING_PROVIDER=rabbitmq or ensure Dapr is configured.");
+                }
                 messagingProviderInstance = createDaprProvider();
                 break;
         }

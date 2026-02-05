@@ -1,8 +1,8 @@
 package com.xshopai.orderprocessor.client;
 
 import io.dapr.client.DaprClient;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -21,17 +21,30 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class DaprSecretManager {
 
     private static final String SECRET_STORE_NAME = "secretstore";
 
     private final DaprClient daprClient;
     private final Environment environment;
+    private final boolean daprEnabled;
+
+    public DaprSecretManager(
+            @Value("${messaging.provider:${MESSAGING_PROVIDER:dapr}}") String messagingProvider,
+            @Autowired(required = false) DaprClient daprClient,
+            Environment environment) {
+        this.daprClient = daprClient;
+        this.environment = environment;
+        this.daprEnabled = "dapr".equalsIgnoreCase(messagingProvider) && daprClient != null;
+    }
 
     @PostConstruct
     public void init() {
-        log.info("Dapr Secret Manager initialized with store: {}", SECRET_STORE_NAME);
+        if (daprEnabled) {
+            log.info("Dapr Secret Manager initialized with store: {} (Dapr enabled)", SECRET_STORE_NAME);
+        } else {
+            log.info("Dapr Secret Manager initialized (Dapr disabled - using env vars only)");
+        }
     }
 
     /**
@@ -48,15 +61,17 @@ public class DaprSecretManager {
     public String getSecret(String key) {
         String envKey = key.replace(":", "_").replace("-", "_").toUpperCase();
         
-        // 1. Try Dapr secret store FIRST
-        String value = tryGetDaprSecret(key);
-        if (value != null && !value.isEmpty()) {
-            log.debug("Found secret from Dapr secret store: {}", key);
-            return value;
+        // 1. Try Dapr secret store FIRST (only if enabled)
+        if (daprEnabled && daprClient != null) {
+            String value = tryGetDaprSecret(key);
+            if (value != null && !value.isEmpty()) {
+                log.debug("Found secret from Dapr secret store: {}", key);
+                return value;
+            }
         }
         
         // 2. Fallback to environment variable (from .env file)
-        value = System.getenv(envKey);
+        String value = System.getenv(envKey);
         if (value != null && !value.isEmpty()) {
             log.debug("Found secret from environment variable: {}", envKey);
             return value;
