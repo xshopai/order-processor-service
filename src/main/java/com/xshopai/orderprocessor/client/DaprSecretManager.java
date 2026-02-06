@@ -48,36 +48,27 @@ public class DaprSecretManager {
     }
 
     /**
-     * Get a specific secret by key with Dapr secret store priority.
+     * Get a specific secret by key with environment variable priority.
      * 
      * Priority:
-     * 1. Dapr secret store (.dapr/secrets.json when running with Dapr)
-     * 2. Environment variable (UPPER_SNAKE_CASE from .env file when running without Dapr)
-     * 3. Spring Environment property (fallback)
+     * 1. Environment variable (UPPER_SNAKE_CASE - from deployment or .env file)
+     * 2. Spring Environment property (application.yml/properties)
+     * 3. Dapr secret store (fallback for local development with .dapr/secrets.json)
      * 
-     * Note: When running with Dapr, secrets come from .dapr/secrets.json.
-     * When running without Dapr, secrets come from .env file or environment variables.
+     * Note: In Docker-only mode (no Dapr), secrets come from environment variables.
+     * Dapr secret store is only used as fallback for local development.
      */
     public String getSecret(String key) {
         String envKey = key.replace(":", "_").replace("-", "_").toUpperCase();
         
-        // 1. Try Dapr secret store FIRST (only if enabled)
-        if (daprEnabled && daprClient != null) {
-            String value = tryGetDaprSecret(key);
-            if (value != null && !value.isEmpty()) {
-                log.debug("Found secret from Dapr secret store: {}", key);
-                return value;
-            }
-        }
-        
-        // 2. Fallback to environment variable (from .env file)
+        // 1. Try environment variable FIRST (from deployment or .env file)
         String value = System.getenv(envKey);
         if (value != null && !value.isEmpty()) {
             log.debug("Found secret from environment variable: {}", envKey);
             return value;
         }
         
-        // 3. Fallback to Spring Environment property
+        // 2. Try Spring Environment property
         value = environment.getProperty(envKey);
         if (value != null && !value.isEmpty()) {
             log.debug("Found secret from Spring environment: {}", envKey);
@@ -92,7 +83,16 @@ public class DaprSecretManager {
             return value;
         }
         
-        log.warn("Secret not found: {} (tried Dapr, env: {}, and Spring)", key, envKey);
+        // 3. Fallback to Dapr secret store (local development only)
+        if (daprEnabled && daprClient != null) {
+            value = tryGetDaprSecret(key);
+            if (value != null && !value.isEmpty()) {
+                log.debug("Found secret from Dapr secret store: {}", key);
+                return value;
+            }
+        }
+        
+        log.warn("Secret not found: {} (tried env: {}, Spring, and Dapr)", key, envKey);
         return null;
     }
     
