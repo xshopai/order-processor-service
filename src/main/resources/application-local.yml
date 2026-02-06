@@ -5,6 +5,17 @@
 messaging:
   provider: rabbitmq
 
+# Service URLs for direct HTTP calls (without Dapr)
+services:
+  order:
+    url: ${ORDER_SERVICE_URL:http://localhost:8006}
+  inventory:
+    url: ${INVENTORY_SERVICE_URL:http://localhost:8005}
+  payment:
+    url: ${PAYMENT_SERVICE_URL:http://localhost:8009}
+  notification:
+    url: ${NOTIFICATION_SERVICE_URL:http://localhost:8011}
+
 # RabbitMQ Configuration
 rabbitmq:
   host: localhost
