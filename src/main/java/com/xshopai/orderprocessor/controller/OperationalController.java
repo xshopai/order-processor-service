@@ -48,23 +48,10 @@ public class OperationalController {
     }
 
     /**
-     * Basic health check endpoint
-     */
-    @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> health() {
-        Map<String, Object> health = new HashMap<>();
-        health.put("status", "healthy");
-        health.put("service", "order-processor-service");
-        health.put("timestamp", Instant.now().toString());
-        health.put("version", System.getProperty("api.version", "1.0.0"));
-        
-        return ResponseEntity.ok(health);
-    }
-
-    /**
      * Readiness probe - check if service is ready to serve traffic
+     * Standard Kubernetes path
      */
-    @GetMapping(value = "/readiness", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/health/ready", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> readiness() {
         try {
             // Add more sophisticated checks here (DB connectivity, message broker, etc.)
@@ -97,8 +84,9 @@ public class OperationalController {
 
     /**
      * Liveness probe - check if the app is running
+     * Standard Kubernetes and Docker path for HEALTHCHECK
      */
-    @GetMapping(value = "/liveness", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/health/live", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> liveness() {
         RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
         double uptimeSeconds = runtimeBean.getUptime() / 1000.0;
