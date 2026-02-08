@@ -233,9 +233,9 @@ APP_CONFIG="development"
 # Secrets are injected as env vars - NO Dapr secretstore access needed at runtime
 print_info "Retrieving secrets from Key Vault..."
 
-# Application Insights
-APP_INSIGHTS_CONN=$(az keyvault secret show --vault-name "$KEY_VAULT" --name "appinsights-connection" --query "value" -o tsv 2>/dev/null || echo "")
-[ -n "$APP_INSIGHTS_CONN" ] && print_success "  appinsights-connection: retrieved" || print_warning "  appinsights-connection: not configured"
+# Per-service Application Insights (each service has its own App Insights resource)
+APP_INSIGHTS_CONN=$(az keyvault secret show --vault-name "$KEY_VAULT" --name "appinsights-order-processor-service" --query "value" -o tsv 2>/dev/null || echo "")
+[ -n "$APP_INSIGHTS_CONN" ] && print_success "  appinsights-order-processor-service: retrieved" || print_warning "  appinsights-order-processor-service: not configured"
 
 # JWT secret
 JWT_SECRET=$(az keyvault secret show --vault-name "$KEY_VAULT" --name "jwt-secret" --query "value" -o tsv 2>/dev/null || echo "")
