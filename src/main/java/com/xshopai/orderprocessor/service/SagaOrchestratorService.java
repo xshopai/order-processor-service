@@ -711,4 +711,141 @@ public class SagaOrchestratorService {
             sagaRepository.save(saga);
         }
     }
+
+    /**
+     * Handle order cancelled event
+     * Triggers saga compensation to refund payment and release inventory
+     */
+    @Transactional
+    public void handleOrderCancelled(OrderCancelledEvent orderCancelledEvent) {
+        log.info("Handling order cancellation for order: {} - Reason: {}", 
+                orderCancelledEvent.getOrderId(), orderCancelledEvent.getCancellationReason());
+
+        Optional<OrderProcessingSaga> sagaOpt = sagaRepository.findByOrderId(orderCancelledEvent.getOrderId());
+        if (sagaOpt.isEmpty()) {
+            log.warn("No saga found for cancelled order: {} - May not have been processed yet", 
+                    orderCancelledEvent.getOrderId());
+            return;
+        }
+
+        OrderProcessingSaga saga = sagaOpt.get();
+        
+        // Check if saga is already in a terminal state
+        if (saga.getStatus() == OrderProcessingSaga.SagaStatus.COMPLETED) {
+            log.warn("Cannot cancel completed saga: {} for order: {}", saga.getId(), orderCancelledEvent.getOrderId());
+            return;
+        }
+
+        if (saga.getStatus() == OrderProcessingSaga.SagaStatus.COMPENSATED) {
+            log.warn("Saga {} already compensated for order: {}", saga.getId(), orderCancelledEvent.getOrderId());
+            return;
+        }
+
+        // Mark saga as cancelling
+        saga.setStatus(OrderProcessingSaga.SagaStatus.COMPENSATING);
+        saga.setErrorMessage(String.format("Order cancelled by %s. Reason: %s", 
+                orderCancelledEvent.getCancelledBy(), 
+                orderCancelledEvent.getCancellationReason()));
+        saga = sagaRepository.save(saga);
+
+        log.info("Saga {} marked for cancellation, starting compensation", saga.getId());
+
+        // Trigger compensation based on what was completed
+        boolean requiresPaymentRefund = orderCancelledEvent.getRequiresPaymentRefund() != null && 
+                                       orderCancelledEvent.getRequiresPaymentRefund();
+        boolean requiresInventoryRelease = orderCancelledEvent.getRequiresInventoryRelease() != null && 
+                                          orderCancelledEvent.getRequiresInventoryRelease();
+
+        if (requiresPaymentRefund && saga.getPaymentId() != null) {
+            log.info("Publishing payment refund for order: {}", orderCancelledEvent.getOrderId());
+            daprEventPublisher.publishPaymentRefund(
+                    orderCancelledEvent.getOrderId(), 
+                    saga.getPaymentId(),
+                    orderCancelledEvent.getCancellationReason(),
+                    orderCancelledEvent.getCorrelationId()
+            );
+        }
+
+        if (requiresInventoryRelease && saga.getInventoryReservationId() != null) {
+            log.info("Publishing inventory release for order: {}", orderCancelledEvent.getOrderId());
+            daprEventPublisher.publishInventoryRelease(
+                    orderCancelledEvent.getOrderId(), 
+                    saga.getInventoryReservationId(),
+                    orderCancelledEvent.getCorrelationId()
+            );
+        }
+
+        // Cancel shipping if it was started
+        if (saga.getShippingId() != null) {
+            log.info("Publishing shipping cancellation for order: {}", orderCancelledEvent.getOrderId());
+            daprEventPublisher.publishShippingCancellation(
+                    orderCancelledEvent.getOrderId(), 
+                    saga.getShippingId()
+            );
+        }
+
+        // Mark saga as compensated
+        saga.setStatus(OrderProcessingSaga.SagaStatus.COMPENSATED);
+        saga.setCompletedAt(LocalDateTime.now());
+        sagaRepository.save(saga);
+
+        log.info("Order cancellation compensation completed for saga: {}", saga.getId());
+        metricsService.recordSagaCancelled(saga.getOrderNumber());
+    }
+
+    /**
+     * Handle return approved event
+     * Publishes events to return inventory to stock and process refund
+     */
+    @Transactional
+    public void handleReturnApproved(ReturnStatusChangedEvent returnEvent) {
+        log.info("Handling return approved for order: {} - Return: {}", 
+                returnEvent.getOrderId(), returnEvent.getReturnNumber());
+
+        // No need to check saga state - returns can be processed for any delivered order
+        // We just need to publish compensating events
+
+        // Publish inventory return event to add items back to stock
+        log.info("Publishing inventory return for return: {}", returnEvent.getReturnNumber());
+        InventoryReturnEvent inventoryReturnEvent = new InventoryReturnEvent();
+        inventoryReturnEvent.setReturnId(returnEvent.getReturnId());
+        inventoryReturnEvent.setOrderId(returnEvent.getOrderId());
+        inventoryReturnEvent.setReturnNumber(returnEvent.getReturnNumber());
+        inventoryReturnEvent.setItems(returnEvent.getItems());
+        inventoryReturnEvent.setCorrelationId(returnEvent.getCorrelationId());
+        
+        daprEventPublisher.publishEvent(
+                "inventory.return.release",
+                inventoryReturnEvent,
+                returnEvent.getCorrelationId()
+        );
+
+        // Publish payment refund event
+        log.info("Publishing payment refund for return: {}", returnEvent.getReturnNumber());
+        daprEventPublisher.publishPaymentRefund(
+                returnEvent.getOrderId(),
+                null, // Payment ID not needed for returns
+                "Return approved: " + returnEvent.getReturnNumber(),
+                returnEvent.getCorrelationId()
+        );
+
+        log.info("Return approval compensation completed for return: {}", returnEvent.getReturnNumber());
+        metricsService.recordSagaCancelled(returnEvent.getReturnNumber()); // Reuse cancellation metric for now
+    }
+
+    /**
+     * Handle return completed event
+     * Logs completion - refund should have been processed by payment service
+     */
+    @Transactional
+    public void handleReturnCompleted(ReturnStatusChangedEvent returnEvent) {
+        log.info("Return completed for order: {} - Return: {}", 
+                returnEvent.getOrderId(), returnEvent.getReturnNumber());
+        
+        // Just log - all compensation actions should have been completed by now
+        log.info("Return processing completed: Return={}, Order={}, Refund={}",
+                returnEvent.getReturnNumber(),
+                returnEvent.getOrderId(),
+                returnEvent.getTotalRefund());
+    }
 }
