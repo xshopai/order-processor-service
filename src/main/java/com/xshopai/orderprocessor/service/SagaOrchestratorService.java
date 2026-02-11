@@ -721,7 +721,7 @@ public class SagaOrchestratorService {
         log.info("Handling order cancellation for order: {} - Reason: {}", 
                 orderCancelledEvent.getOrderId(), orderCancelledEvent.getCancellationReason());
 
-        Optional<OrderProcessingSaga> sagaOpt = sagaRepository.findByOrderId(orderCancelledEvent.getOrderId());
+        Optional<OrderProcessingSaga> sagaOpt = sagaRepository.findByOrderId(UUID.fromString(orderCancelledEvent.getOrderId()));
         if (sagaOpt.isEmpty()) {
             log.warn("No saga found for cancelled order: {} - May not have been processed yet", 
                     orderCancelledEvent.getOrderId());
@@ -760,9 +760,7 @@ public class SagaOrchestratorService {
             log.info("Publishing payment refund for order: {}", orderCancelledEvent.getOrderId());
             daprEventPublisher.publishPaymentRefund(
                     orderCancelledEvent.getOrderId(), 
-                    saga.getPaymentId(),
-                    orderCancelledEvent.getCancellationReason(),
-                    orderCancelledEvent.getCorrelationId()
+                    saga.getPaymentId()
             );
         }
 
@@ -770,8 +768,7 @@ public class SagaOrchestratorService {
             log.info("Publishing inventory release for order: {}", orderCancelledEvent.getOrderId());
             daprEventPublisher.publishInventoryRelease(
                     orderCancelledEvent.getOrderId(), 
-                    saga.getInventoryReservationId(),
-                    orderCancelledEvent.getCorrelationId()
+                    saga.getInventoryReservationId()
             );
         }
 
@@ -814,7 +811,7 @@ public class SagaOrchestratorService {
         inventoryReturnEvent.setItems(returnEvent.getItems());
         inventoryReturnEvent.setCorrelationId(returnEvent.getCorrelationId());
         
-        daprEventPublisher.publishEvent(
+        daprEventPublisher.publishEventWithCorrelationId(
                 "inventory.return.release",
                 inventoryReturnEvent,
                 returnEvent.getCorrelationId()
@@ -824,9 +821,7 @@ public class SagaOrchestratorService {
         log.info("Publishing payment refund for return: {}", returnEvent.getReturnNumber());
         daprEventPublisher.publishPaymentRefund(
                 returnEvent.getOrderId(),
-                null, // Payment ID not needed for returns
-                "Return approved: " + returnEvent.getReturnNumber(),
-                returnEvent.getCorrelationId()
+                null
         );
 
         log.info("Return approval compensation completed for return: {}", returnEvent.getReturnNumber());
