@@ -20,8 +20,8 @@ services:
 rabbitmq:
   host: localhost
   port: 5672
-  username: guest
-  password: guest
+  username: admin
+  password: admin123
   virtual-host: /
   exchange: order-processor-events
   queue: order-processor-queue
@@ -43,9 +43,9 @@ service-tokens:
 # Database - Direct connection (no Dapr secrets)
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/OrderProcessorDb
+    url: jdbc:postgresql://localhost:5435/order_processor_db
     username: postgres
-    password: password
+    password: postgres
 
 logging:
   level:
