@@ -8,6 +8,17 @@ echo "Dapr HTTP endpoint: http://localhost:3507"
 echo "Dapr gRPC endpoint: localhost:50007"
 echo ""
 
+# Navigate to service root directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVICE_DIR="$(dirname "$SCRIPT_DIR")"
+cd "$SERVICE_DIR"
+
+# Copy application-dapr.yml to application.yml for Dapr mode
+if [ -f "src/main/resources/application-dapr.yml" ]; then
+    cp "src/main/resources/application-dapr.yml" "src/main/resources/application.yml"
+    echo "✅ Copied application-dapr.yml → application.yml"
+fi
+
 # Kill any processes using required ports (prevents "address already in use" errors)
 for PORT in 8007 3507 50007; do
     for pid in $(netstat -ano 2>/dev/null | grep ":$PORT" | grep LISTENING | awk '{print $5}' | sort -u); do
@@ -24,5 +35,5 @@ dapr run \
   --log-level info \
   --config ./.dapr/config.yaml \
   --resources-path ./.dapr/components \
-  -- mvn spring-boot:run -Dmaven.test.skip=true -Dspring-boot.run.profiles=dapr
+  -- mvn spring-boot:run -Dmaven.test.skip=true
 

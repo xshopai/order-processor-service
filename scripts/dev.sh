@@ -18,5 +18,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SERVICE_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$SERVICE_DIR"
 
-# Run with Spring Boot using dev profile (skip tests for faster startup)
-mvn spring-boot:run -Dspring-boot.run.profiles=dev -Dmaven.test.skip=true
+# Copy application-dev.yml to application.yml for local development
+if [ -f "src/main/resources/application-dev.yml" ]; then
+    cp "src/main/resources/application-dev.yml" "src/main/resources/application.yml"
+    echo "✅ Copied application-dev.yml → application.yml"
+fi
+
+# Run with Spring Boot (skip tests for faster startup)
+mvn spring-boot:run -Dmaven.test.skip=true

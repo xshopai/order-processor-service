@@ -1,146 +1,52 @@
-# Order Processor Service Configuration
-# Dapr-only architecture: Messaging, secrets, tracing, and service invocation handled by Dapr
+# Order Processor Service - Local Configuration (without Dapr)
+# Usage: Set SPRING_PROFILES_ACTIVE=local
 
-# Messaging Configuration
+# Messaging - Direct RabbitMQ connection
 messaging:
-  provider: ${MESSAGING_PROVIDER:rabbitmq}
+  provider: rabbitmq
 
+# Service URLs for direct HTTP calls (without Dapr)
+services:
+  order:
+    url: ${ORDER_SERVICE_URL:http://localhost:8006}
+  inventory:
+    url: ${INVENTORY_SERVICE_URL:http://localhost:8005}
+  payment:
+    url: ${PAYMENT_SERVICE_URL:http://localhost:8009}
+  notification:
+    url: ${NOTIFICATION_SERVICE_URL:http://localhost:8011}
+
+# RabbitMQ Configuration
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: admin
+  password: admin123
+  virtual-host: /
+  exchange: order-processor-events
+  queue: order-processor-queue
+
+# JWT Configuration (required for non-Dapr mode)
+jwt:
+  secret: 8tDBDMcpxroHoHjXjk8xp/uAn8rzD4y8ZZremFkC4gI=
+  issuer: auth-service
+  audience: xshopai-platform
+
+# Service Tokens (for service-to-service communication)
+service-tokens:
+  order-service: svc-order-service-4ff5876fc86cc45a18d88e5d
+  inventory-service: svc-inventory-service-4ff5876fc86cc45a18d88e5d
+  payment-service: svc-payment-service-4ff5876fc86cc45a18d88e5d
+  notification-service: svc-notification-service-4ff5876fc86cc45a18d88e5d
+  web-bff: svc-web-bff-4ff5876fc86cc45a18d88e5d
+
+# Database - Direct connection (no Dapr secrets)
 spring:
-  application:
-    name: ${OTEL_SERVICE_NAME:order-processor-service}
-
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:development}
-
-  # Database configuration - credentials loaded from environment variables
   datasource:
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    open-in-view: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        jdbc:
-          batch_size: 25
-          batch_versioned_data: true
-        order_inserts: true
-        order_updates: true
-
-  flyway:
-    locations: classpath:db/migration
-    enabled: true
-
-  jackson:
-    default-property-inclusion: non_null
-    serialization:
-      write-dates-as-timestamps: false
-    deserialization:
-      fail-on-unknown-properties: false
-    date-format: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
+    url: jdbc:postgresql://localhost:5435/order_processor_db
+    username: postgres
+    password: postgres
 
 logging:
   level:
-    root: INFO
-    com.xshopai.orderprocessor: INFO
-    org.springframework: WARN
-    org.hibernate: WARN
-    org.flywaydb: INFO
-
-# Actuator endpoints for health checks
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-      base-path: /actuator
-  endpoint:
-    health:
-      show-details: always
-      probes:
-        enabled: true
-  health:
-    db:
-      enabled: true
-  # =============================================================================
-  # OpenTelemetry Tracing Configuration (Spring Boot)
-  # =============================================================================
-  # Set via environment variables:
-  #   Option 1 - Zipkin:
-  #     OTEL_TRACES_EXPORTER=zipkin
-  #     OTEL_EXPORTER_ZIPKIN_ENDPOINT=http://localhost:9411/api/v2/spans
-  #   Option 2 - OTLP:
-  #     OTEL_TRACES_EXPORTER=otlp
-  #     OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
-  #   Option 3 - Azure: Use Azure Application Insights Java agent or OTLP
-  #     -javaagent:applicationinsights-agent.jar
-  #   Option 4 - Disable:
-  #     TRACING_ENABLED=false
-  # =============================================================================
-  tracing:
-    enabled: ${TRACING_ENABLED:true}
-    sampling:
-      probability: 1.0
-    propagation:
-      type: w3c
-  zipkin:
-    tracing:
-      endpoint: ${OTEL_EXPORTER_ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}
-  otlp:
-    tracing:
-      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
-
-# Server configuration
-server:
-  port: ${SERVER_PORT:8007}
-  servlet:
-    context-path: /
-  error:
-    include-message: always
-    include-binding-errors: always
-
-# Application metadata
-application:
-  version: ${APPLICATION_VERSION:1.0.0}
-
-# Dapr configuration
-dapr:
-  host: ${DAPR_HOST:localhost}
-  http-port: ${DAPR_HTTP_PORT:3500}
-  grpc-port: ${DAPR_GRPC_PORT:50001}
-  app-id: ${DAPR_APP_ID:order-processor-service}
-  pubsub-name: pubsub
-
-# Service invocation via Dapr (app-id based, not URLs)
-services:
-  order:
-    app-id: order-service
-  payment:
-    app-id: payment-service
-  inventory:
-    app-id: inventory-service
-  shipping:
-    app-id: shipping-service
-
-# JWT Configuration
-# Only JWT_SECRET is truly secret (loaded from Dapr Secret Store)
-# Algorithm and expiration are just configuration values
-jwt:
-  algorithm: ${JWT_ALGORITHM:HS256}
-  expiration-seconds: ${JWT_EXPIRATION:3600}
-  issuer: ${JWT_ISSUER:auth-service}
-  audience: ${JWT_AUDIENCE:xshopai-platform}
-
-# Saga orchestration configuration
-saga:
-  retry:
-    max-attempts: 3
-    backoff-multiplier: 2
-    initial-delay-ms: 1000
-  timeout:
-    payment-seconds: 300
-    inventory-seconds: 180
-    shipping-seconds: 240
-  scheduler:
-    stuck-sagas-check-ms: 900000
-    retry-sagas-check-ms: 300000
+    com.xshopai.orderprocessor: DEBUG
