@@ -90,7 +90,7 @@ public class DaprEventPublisher {
 
     // Order Events
     public void publishOrderCreated(Object event) {
-        publishEvent("order.created", event);
+        publishEvent("order.placed", event);
     }
 
     public void publishOrderStatusChanged(Object event) {
