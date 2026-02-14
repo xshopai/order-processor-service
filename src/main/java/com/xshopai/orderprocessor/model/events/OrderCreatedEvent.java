@@ -1,6 +1,7 @@
 package com.xshopai.orderprocessor.model.events;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,10 +14,12 @@ import java.util.UUID;
  * Matches the schema from the .NET Order Service
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OrderCreatedEvent {
     private UUID orderId;
     private String correlationId;
     private String customerId;
+    private String customerEmail;
     private String orderNumber;
     private BigDecimal totalAmount;
     private String currency;
