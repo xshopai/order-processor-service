@@ -44,7 +44,7 @@ public class RabbitMQConsumer {
      * Topics this service subscribes to (must match subscriptions.yaml)
      */
     private static final List<String> SUBSCRIBED_TOPICS = Arrays.asList(
-            "order.placed",
+            "order.created",
             "payment.processed",
             "payment.failed",
             "inventory.reserved",
@@ -184,7 +184,7 @@ public class RabbitMQConsumer {
         log.info("Processing {} event, correlationId: {}", topic, correlationId);
 
         switch (topic) {
-            case "order.placed":
+            case "order.created":
                 OrderCreatedEvent orderCreatedEvent = objectMapper.readValue(message, OrderCreatedEvent.class);
                 sagaOrchestratorService.startOrderProcessingSaga(orderCreatedEvent);
                 break;

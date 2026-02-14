@@ -24,17 +24,17 @@ public class OrderEventConsumer {
     private final SagaOrchestratorService sagaOrchestratorService;
 
     /**
-     * Handle order.placed event
+     * Handle order.created event
      */
     @PostMapping("/order-created")
     public ResponseEntity<Void> handleOrderCreated(@RequestBody CloudEvent<OrderCreatedEvent> cloudEvent) {
         try {
-            log.info("Received order.placed event: {}", cloudEvent.getId());
+            log.info("Received order.created event: {}", cloudEvent.getId());
             OrderCreatedEvent event = cloudEvent.getData();
             sagaOrchestratorService.startOrderProcessingSaga(event);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            log.error("Error handling order.placed event", e);
+            log.error("Error handling order.created event", e);
             return ResponseEntity.status(500).build();
         }
     }
