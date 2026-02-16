@@ -1,5 +1,6 @@
-package com.xshopai.orderprocessor.controller;
+package com.xshopai.orderprocessor.unit.controller;
 
+import com.xshopai.orderprocessor.controller.OperationalController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;

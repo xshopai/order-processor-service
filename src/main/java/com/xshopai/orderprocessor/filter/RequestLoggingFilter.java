@@ -14,7 +14,6 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
-import java.util.Enumeration;
 
 /**
  * Filter to log HTTP requests and responses

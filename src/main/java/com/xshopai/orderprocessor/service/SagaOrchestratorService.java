@@ -324,6 +324,7 @@ public class SagaOrchestratorService {
     /**
      * Process payment for the order
      */
+    @SuppressWarnings("unused")
     private void processPayment(OrderProcessingSaga saga, OrderCreatedEvent orderEvent) {
         log.info("Processing payment for saga: {}", saga.getId());
 
@@ -342,6 +343,7 @@ public class SagaOrchestratorService {
     /**
      * Retry payment processing
      */
+    @SuppressWarnings("unused")
     private void processPaymentRetry(OrderProcessingSaga saga) {
         log.info("Retrying payment for saga: {}", saga.getId());
         
@@ -489,6 +491,7 @@ public class SagaOrchestratorService {
      * Kept for potential future use or emergency recovery
      */
     @Deprecated
+    @SuppressWarnings("unused")
     private void retryCurrentStep(OrderProcessingSaga saga) {
         log.info("Retry mechanism disabled in admin-driven workflow for saga: {}", saga.getId());
         // Admin must manually intervene - no automatic retries

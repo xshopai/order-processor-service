@@ -119,6 +119,7 @@ public class OrderProcessingSaga {
         return false;
     }
 
+    @SuppressWarnings("unused")
     private boolean isProcessingStep() {
         return status == SagaStatus.PENDING_PAYMENT_CONFIRMATION ||
                status == SagaStatus.PENDING_SHIPPING_PREPARATION;

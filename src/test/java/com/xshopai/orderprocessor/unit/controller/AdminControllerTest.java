@@ -1,5 +1,6 @@
-package com.xshopai.orderprocessor.controller;
+package com.xshopai.orderprocessor.unit.controller;
 
+import com.xshopai.orderprocessor.controller.AdminController;
 import com.xshopai.orderprocessor.model.entity.OrderProcessingSaga;
 import com.xshopai.orderprocessor.repository.OrderProcessingSagaRepository;
 import org.junit.jupiter.api.Test;

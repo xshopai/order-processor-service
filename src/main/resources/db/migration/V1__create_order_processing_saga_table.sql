@@ -46,14 +46,14 @@ CREATE TABLE IF NOT EXISTS order_processing_saga (
 );
 
 -- Create indexes for common queries
-CREATE INDEX idx_order_processing_saga_order_id ON order_processing_saga(order_id);
-CREATE INDEX idx_order_processing_saga_customer_id ON order_processing_saga(customer_id);
-CREATE INDEX idx_order_processing_saga_status ON order_processing_saga(status);
-CREATE INDEX idx_order_processing_saga_created_at ON order_processing_saga(created_at);
-CREATE INDEX idx_order_processing_saga_updated_at ON order_processing_saga(updated_at);
+CREATE INDEX IF NOT EXISTS idx_order_processing_saga_order_id ON order_processing_saga(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_processing_saga_customer_id ON order_processing_saga(customer_id);
+CREATE INDEX IF NOT EXISTS idx_order_processing_saga_status ON order_processing_saga(status);
+CREATE INDEX IF NOT EXISTS idx_order_processing_saga_created_at ON order_processing_saga(created_at);
+CREATE INDEX IF NOT EXISTS idx_order_processing_saga_updated_at ON order_processing_saga(updated_at);
 
 -- Composite index for finding stuck sagas
-CREATE INDEX idx_order_processing_saga_status_updated ON order_processing_saga(status, updated_at);
+CREATE INDEX IF NOT EXISTS idx_order_processing_saga_status_updated ON order_processing_saga(status, updated_at);
 
 -- Comments for documentation
 COMMENT ON TABLE order_processing_saga IS 'Tracks the state of order processing sagas using choreography pattern';
