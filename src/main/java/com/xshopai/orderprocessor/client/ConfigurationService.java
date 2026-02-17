@@ -11,17 +11,17 @@ import jakarta.annotation.PostConstruct;
 import java.util.Map;
 
 /**
- * Dapr Secret Manager
- * Handles retrieving secrets from Dapr secret store with multi-format support.
+ * Configuration Service
+ * Handles retrieving secrets with environment variable priority.
  * 
- * Supports multiple secret key formats for different environments:
- * - Local development: colon separator (database:host) via local file store
- * - Azure Key Vault: dash separator (database-host) via Key Vault
- * - Environment variables: underscore separator (database_host) as fallback
+ * Priority:
+ * 1. Environment variables (UPPER_SNAKE_CASE - from deployment or .env file)
+ * 2. Spring Environment property (application.yml/properties)
+ * 3. Dapr secret store (fallback for local development with .dapr/secrets.json)
  */
 @Service
 @Slf4j
-public class DaprSecretManager {
+public class ConfigurationService {
 
     private static final String SECRET_STORE_NAME = "secretstore";
 
@@ -29,7 +29,7 @@ public class DaprSecretManager {
     private final Environment environment;
     private final boolean daprEnabled;
 
-    public DaprSecretManager(
+    public ConfigurationService(
             @Value("${messaging.provider:${MESSAGING_PROVIDER:dapr}}") String messagingProvider,
             @Autowired(required = false) DaprClient daprClient,
             Environment environment) {
@@ -41,9 +41,9 @@ public class DaprSecretManager {
     @PostConstruct
     public void init() {
         if (daprEnabled) {
-            log.info("Dapr Secret Manager initialized with store: {} (Dapr enabled)", SECRET_STORE_NAME);
+            log.info("Configuration Service initialized with Dapr secret store: {} (Dapr enabled)", SECRET_STORE_NAME);
         } else {
-            log.info("Dapr Secret Manager initialized (Dapr disabled - using env vars only)");
+            log.info("Configuration Service initialized (using env vars/config only)");
         }
     }
 
