@@ -2,20 +2,27 @@
 -- This allows the saga to store all necessary data from OrderCreatedEvent
 -- without needing to make HTTP calls to other services
 
--- Add order items as JSON (contains product details, quantities, prices)
-ALTER TABLE order_processing_saga 
-ADD COLUMN order_items JSONB;
+-- Add columns idempotently
+DO $$
+BEGIN
+    -- Add order items as JSON (contains product details, quantities, prices)
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'order_processing_saga' AND column_name = 'order_items') THEN
+        ALTER TABLE order_processing_saga ADD COLUMN order_items JSONB;
+    END IF;
+    
+    -- Add shipping address as JSON
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'order_processing_saga' AND column_name = 'shipping_address') THEN
+        ALTER TABLE order_processing_saga ADD COLUMN shipping_address JSONB;
+    END IF;
+    
+    -- Add billing address as JSON
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'order_processing_saga' AND column_name = 'billing_address') THEN
+        ALTER TABLE order_processing_saga ADD COLUMN billing_address JSONB;
+    END IF;
+END $$;
 
--- Add shipping address as JSON
-ALTER TABLE order_processing_saga 
-ADD COLUMN shipping_address JSONB;
-
--- Add billing address as JSON
-ALTER TABLE order_processing_saga 
-ADD COLUMN billing_address JSONB;
-
--- Add index for querying by product in order items
-CREATE INDEX idx_order_processing_saga_order_items 
+-- Add index for querying by product in order items (idempotent)
+CREATE INDEX IF NOT EXISTS idx_order_processing_saga_order_items 
 ON order_processing_saga USING GIN (order_items);
 
 -- Add comments

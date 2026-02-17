@@ -23,24 +23,34 @@ CREATE TABLE IF NOT EXISTS saga_event_log (
     -- Processing information
     processed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     processing_status VARCHAR(50) NOT NULL DEFAULT 'SUCCESS',
-    error_message TEXT,
-    
-    -- Foreign key
-    CONSTRAINT fk_saga_event_log_saga 
-        FOREIGN KEY (saga_id) 
-        REFERENCES order_processing_saga(id) 
-        ON DELETE CASCADE
+    error_message TEXT
 );
 
--- Create indexes
-CREATE INDEX idx_saga_event_log_saga_id ON saga_event_log(saga_id);
-CREATE INDEX idx_saga_event_log_order_id ON saga_event_log(order_id);
-CREATE INDEX idx_saga_event_log_event_type ON saga_event_log(event_type);
-CREATE INDEX idx_saga_event_log_processed_at ON saga_event_log(processed_at);
-CREATE INDEX idx_saga_event_log_correlation_id ON saga_event_log(correlation_id);
+-- Add foreign key constraint if not exists
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints 
+        WHERE constraint_name = 'fk_saga_event_log_saga' 
+        AND table_name = 'saga_event_log'
+    ) THEN
+        ALTER TABLE saga_event_log
+            ADD CONSTRAINT fk_saga_event_log_saga 
+            FOREIGN KEY (saga_id) 
+            REFERENCES order_processing_saga(id) 
+            ON DELETE CASCADE;
+    END IF;
+END $$;
+
+-- Create indexes (idempotent)
+CREATE INDEX IF NOT EXISTS idx_saga_event_log_saga_id ON saga_event_log(saga_id);
+CREATE INDEX IF NOT EXISTS idx_saga_event_log_order_id ON saga_event_log(order_id);
+CREATE INDEX IF NOT EXISTS idx_saga_event_log_event_type ON saga_event_log(event_type);
+CREATE INDEX IF NOT EXISTS idx_saga_event_log_processed_at ON saga_event_log(processed_at);
+CREATE INDEX IF NOT EXISTS idx_saga_event_log_correlation_id ON saga_event_log(correlation_id);
 
 -- Composite index for saga timeline queries
-CREATE INDEX idx_saga_event_log_saga_processed ON saga_event_log(saga_id, processed_at);
+CREATE INDEX IF NOT EXISTS idx_saga_event_log_saga_processed ON saga_event_log(saga_id, processed_at);
 
 -- Comments
 COMMENT ON TABLE saga_event_log IS 'Audit log of all events processed by sagas';

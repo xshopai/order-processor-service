@@ -1,6 +1,9 @@
 # Order Processor Service - Local Configuration (without Dapr)
 # Usage: Set SPRING_PROFILES_ACTIVE=local
 
+server:
+  port: ${PORT:8007}
+
 # Messaging - Direct RabbitMQ connection
 messaging:
   provider: rabbitmq
