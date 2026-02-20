@@ -64,10 +64,11 @@ USER appuser
 
 # Health check (using wget GET request to /health/live)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD wget -qO- http://localhost:8007/health/live > /dev/null || exit 1
+    CMD wget -qO- http://localhost:8080/health/live > /dev/null || exit 1
 
 # Expose port
-EXPOSE 8007
+ENV SERVER_PORT=8080
+EXPOSE 8080
 
 # Optimized JVM settings for containerized Spring Boot
 ENV JAVA_OPTS="-XX:+UseContainerSupport \
