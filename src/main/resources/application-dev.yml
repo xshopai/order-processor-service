@@ -8,17 +8,6 @@ server:
 messaging:
   provider: rabbitmq
 
-# Service URLs for direct HTTP calls (without Dapr)
-services:
-  order:
-    url: ${ORDER_SERVICE_URL:http://localhost:8006}
-  inventory:
-    url: ${INVENTORY_SERVICE_URL:http://localhost:8005}
-  payment:
-    url: ${PAYMENT_SERVICE_URL:http://localhost:8009}
-  notification:
-    url: ${NOTIFICATION_SERVICE_URL:http://localhost:8011}
-
 # RabbitMQ Configuration
 rabbitmq:
   host: localhost
@@ -28,20 +17,6 @@ rabbitmq:
   virtual-host: /
   exchange: order-processor-events
   queue: order-processor-queue
-
-# JWT Configuration (required for non-Dapr mode)
-jwt:
-  secret: 8tDBDMcpxroHoHjXjk8xp/uAn8rzD4y8ZZremFkC4gI=
-  issuer: auth-service
-  audience: xshopai-platform
-
-# Service Tokens (for service-to-service communication)
-service-tokens:
-  order-service: svc-order-service-4ff5876fc86cc45a18d88e5d
-  inventory-service: svc-inventory-service-4ff5876fc86cc45a18d88e5d
-  payment-service: svc-payment-service-4ff5876fc86cc45a18d88e5d
-  notification-service: svc-notification-service-4ff5876fc86cc45a18d88e5d
-  web-bff: svc-web-bff-4ff5876fc86cc45a18d88e5d
 
 # Database - Direct connection (no Dapr secrets)
 spring:
