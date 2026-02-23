@@ -4,6 +4,11 @@
 server:
   port: 8007
 
+# Service Invocation Mode
+service:
+  invocation:
+    mode: dapr
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5435/order_processor_db
