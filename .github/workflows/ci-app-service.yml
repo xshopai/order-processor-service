@@ -168,11 +168,11 @@ jobs:
           package: target/*.jar
 
       # -------------------------------------------------------------------
-      # Health check
+      # Health check (Spring Boot uses /actuator/health)
       # -------------------------------------------------------------------
       - name: Verify deployment
         run: |
-          URL="https://${APP_NAME}.azurewebsites.net/health/live"
+          URL="https://${APP_NAME}.azurewebsites.net/actuator/health"
           echo "Deployment complete. Performing basic health check..."
           echo "App Service URL: $URL"
 
