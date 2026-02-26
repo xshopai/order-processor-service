@@ -18,10 +18,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SERVICE_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$SERVICE_DIR"
 
-# Copy application-dev.yml to application.yml for local development
+# Copy profile config to application.yml:
+#   application-dev.yml  — written by Codespace setup.sh with Docker hostnames
+#   application-http.yml — present in repo, used for local dev (localhost ports)
 if [ -f "src/main/resources/application-dev.yml" ]; then
     cp "src/main/resources/application-dev.yml" "src/main/resources/application.yml"
-    echo "✅ Copied application-dev.yml → application.yml"
+    echo "✅ Copied application-dev.yml → application.yml (Codespace)"
+elif [ -f "src/main/resources/application-http.yml" ]; then
+    cp "src/main/resources/application-http.yml" "src/main/resources/application.yml"
+    echo "✅ Copied application-http.yml → application.yml (local dev)"
 fi
 
 # Run with Spring Boot (skip tests for faster startup)
