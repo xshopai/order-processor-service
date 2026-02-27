@@ -76,6 +76,7 @@ HELP.md
 # Application specific
 # application-local.properties
 # application-secrets.properties
+src/main/resources/application-dev.yml
 
 # Secrets - Never commit these
 secrets/
