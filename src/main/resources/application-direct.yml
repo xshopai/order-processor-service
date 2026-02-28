@@ -4,10 +4,9 @@
 server:
   port: ${PORT:8007}
 
-# Service Invocation Mode
-service:
-  invocation:
-    mode: http
+# Platform Mode
+platform:
+  mode: direct
 
 # Messaging - Direct RabbitMQ connection
 messaging:

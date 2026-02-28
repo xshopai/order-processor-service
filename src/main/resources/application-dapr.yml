@@ -4,10 +4,9 @@
 server:
   port: 8007
 
-# Service Invocation Mode
-service:
-  invocation:
-    mode: dapr
+# Platform Mode
+platform:
+  mode: dapr
 
 spring:
   datasource:

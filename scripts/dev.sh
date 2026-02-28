@@ -20,13 +20,13 @@ cd "$SERVICE_DIR"
 
 # Copy profile config to application.yml:
 #   application-dev.yml  — written by Codespace setup.sh with Docker hostnames
-#   application-http.yml — present in repo, used for local dev (localhost ports)
+#   application-direct.yml — present in repo, used for local dev (localhost ports)
 if [ -f "src/main/resources/application-dev.yml" ]; then
     cp "src/main/resources/application-dev.yml" "src/main/resources/application.yml"
     echo "✅ Copied application-dev.yml → application.yml (Codespace)"
-elif [ -f "src/main/resources/application-http.yml" ]; then
-    cp "src/main/resources/application-http.yml" "src/main/resources/application.yml"
-    echo "✅ Copied application-http.yml → application.yml (local dev)"
+elif [ -f "src/main/resources/application-direct.yml" ]; then
+    cp "src/main/resources/application-direct.yml" "src/main/resources/application.yml"
+    echo "✅ Copied application-direct.yml → application.yml (local dev)"
 fi
 
 # Run with Spring Boot (skip tests for faster startup)
