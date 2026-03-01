@@ -8,6 +8,10 @@ server:
 platform:
   mode: direct
 
+# Consul Service Discovery
+consul:
+  url: http://localhost:8500
+
 # Messaging - Direct RabbitMQ connection
 messaging:
   provider: rabbitmq

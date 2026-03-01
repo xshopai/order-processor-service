@@ -16,7 +16,7 @@ import java.time.Duration;
 /**
  * Consul self-registration component.
  * Registers on startup, deregisters on shutdown.
- * Only active when CONSUL_URL environment variable is set.
+ * Only active when consul.url is set in application properties.
  */
 @Component
 public class ConsulRegistration {
@@ -26,7 +26,9 @@ public class ConsulRegistration {
   @Value("${server.port:8007}")
   private int port;
 
-  private final String consulUrl = System.getenv("CONSUL_URL") != null ? System.getenv("CONSUL_URL") : "";
+  @Value("${consul.url:}")
+  private String consulUrl;
+
   private final String host = System.getenv("HOST") != null ? System.getenv("HOST") : "localhost";
   private String serviceId = "";
 
@@ -50,7 +52,7 @@ public class ConsulRegistration {
             "Address": "%s",
             "Port": %d,
             "Check": {
-                "HTTP": "http://%s:%d/health",
+                "HTTP": "http://%s:%d/health/live",
                 "Interval": "10s",
                 "Timeout": "5s",
                 "DeregisterCriticalServiceAfter": "30s"
