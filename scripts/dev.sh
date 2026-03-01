@@ -13,6 +13,13 @@ for pid in $(netstat -ano 2>/dev/null | grep ":$PORT" | grep LISTENING | awk '{p
     taskkill //F //PID $pid 2>/dev/null
 done
 
+# Fix JAVA_HOME if it points to a non-existent directory (e.g. jdk-25 vs jdk-25.0.2)
+if [ -n "$JAVA_HOME" ] && [ ! -d "$JAVA_HOME" ]; then
+    JAVA_HOME=$(java -XshowSettings:property -version 2>&1 | grep 'java.home' | awk '{print $NF}')
+    export JAVA_HOME
+    echo "✅ Fixed JAVA_HOME → $JAVA_HOME"
+fi
+
 # Navigate to service root directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SERVICE_DIR="$(dirname "$SCRIPT_DIR")"
