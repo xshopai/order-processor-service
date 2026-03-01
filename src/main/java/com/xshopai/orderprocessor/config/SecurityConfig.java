@@ -23,26 +23,26 @@ public class SecurityConfig {
 
     /**
      * Configure security filter chain
-     * Note: This service primarily acts as a message consumer, but we still secure the APIs
+     * Note: This service primarily acts as a message consumer, but we still secure
+     * the APIs
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(authorizeRequests -> 
-                authorizeRequests
-                    // Operational endpoints (no auth required)
-                    .requestMatchers("/", "/version", "/health", "/health/**", "/readiness", "/liveness", "/metrics").permitAll()
-                    .requestMatchers("/actuator/**").permitAll()
-                    .requestMatchers("/dapr/**").permitAll()  // Allow Dapr pub/sub subscriptions
-                    .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                    .anyRequest().authenticated()
-            )
-            .sessionManagement(sessionManagement ->
-                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-            
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        // Operational endpoints (no auth required)
+                        .requestMatchers("/", "/version", "/health", "/health/**", "/readiness", "/liveness",
+                                "/metrics")
+                        .permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/dapr/**").permitAll() // Allow Dapr pub/sub subscriptions
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .sessionManagement(
+                        sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }
