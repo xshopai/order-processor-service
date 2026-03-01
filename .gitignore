@@ -4,6 +4,9 @@
 # Log files
 *.log
 
+# Generated profile config (written by Codespace setup.sh, not committed)
+src/main/resources/application-dev.yml
+
 # BlueJ files
 *.ctxt
 
