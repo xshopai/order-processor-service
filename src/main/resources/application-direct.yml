@@ -11,6 +11,7 @@ platform:
 # Consul Service Discovery
 consul:
   url: http://localhost:8500
+  health-host: host.docker.internal
 
 # Messaging - Direct RabbitMQ connection
 messaging:

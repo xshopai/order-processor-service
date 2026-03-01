@@ -29,6 +29,9 @@ public class ConsulRegistration {
   @Value("${consul.url:}")
   private String consulUrl;
 
+  @Value("${consul.health-host:host.docker.internal}")
+  private String consulHealthHost;
+
   private final String host = System.getenv("HOST") != null ? System.getenv("HOST") : "localhost";
   private String serviceId = "";
 
@@ -58,7 +61,7 @@ public class ConsulRegistration {
                 "DeregisterCriticalServiceAfter": "30s"
             }
         }
-        """, serviceId, serviceName, address, port, address, port);
+        """, serviceId, serviceName, address, port, consulHealthHost, port);
 
     try {
       HttpRequest request = HttpRequest.newBuilder()
