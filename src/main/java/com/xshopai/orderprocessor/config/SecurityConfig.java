@@ -32,7 +32,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorizeRequests -> 
                 authorizeRequests
                     // Operational endpoints (no auth required)
-                    .requestMatchers("/", "/version", "/health", "/readiness", "/liveness", "/metrics").permitAll()
+                    .requestMatchers("/", "/version", "/health", "/health/**", "/readiness", "/liveness", "/metrics").permitAll()
                     .requestMatchers("/actuator/**").permitAll()
                     .requestMatchers("/dapr/**").permitAll()  // Allow Dapr pub/sub subscriptions
                     .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
