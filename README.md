@@ -1,137 +1,80 @@
+<div align="center">
+
 # 🔄 Order Processor Service
 
-Saga orchestration microservice for xshopai - implements choreography-based saga pattern for distributed order processing transactions across payment, inventory, and shipping services.
+**Saga orchestration microservice for distributed order processing in the xshopai platform**
 
-## 🚀 Quick Start
+[![Java](https://img.shields.io/badge/Java-17+-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://adoptium.net)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12+-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
+[![Dapr](https://img.shields.io/badge/Dapr-Enabled-0D597F?style=for-the-badge&logo=dapr&logoColor=white)](https://dapr.io)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-### Prerequisites
+[Getting Started](#-getting-started) •
+[Documentation](#-documentation) •
+[Architecture](#-architecture) •
+[Contributing](#-contributing)
 
-- **Java** 21+ ([Download](https://adoptium.net/))
-- **Maven** 3.9+ ([Install Guide](https://maven.apache.org/install.html))
-- **PostgreSQL** 12+ ([Download](https://www.postgresql.org/download/))
-- **Dapr CLI** 1.16+ ([Install Guide](https://docs.dapr.io/getting-started/install-dapr-cli/))
+</div>
 
-### Setup
+---
 
-**1. Start PostgreSQL**
+## 🎯 Overview
 
-```bash
-# Using Docker (recommended)
-docker run -d --name order-processor-postgres -p 5432:5432 \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=order_processor_db \
-  postgres:12
+The **Order Processor Service** implements a choreography-based saga pattern for distributed order processing. It coordinates transactions across payment, inventory, and shipping services, handling compensations on failure to maintain eventual consistency. Built with Spring Boot 3 and Java 17, it uses Flyway for database migrations and integrates with the Dapr service mesh.
 
-# Or install PostgreSQL locally
-```
-
-**2. Clone & Build**
-
-```bash
-git clone https://github.com/xshopai/order-processor-service.git
-cd order-processor-service
-mvn clean install
-```
-
-**3. Configure Environment**
-
-```bash
-# Edit application.properties or create application-dev.properties
-# spring.datasource.url=jdbc:postgresql://localhost:5432/order_processor_db
-# spring.datasource.username=postgres
-# spring.datasource.password=postgres
-```
-
-**4. Initialize Dapr**
-
-```bash
-# First time only
-dapr init
-```
-
-**5. Run Service**
-
-```bash
-# Start with Dapr (recommended)
-./run.sh       # Linux/Mac
-.\run.ps1      # Windows
-
-# Or run directly
-mvn spring-boot:run
-```
-
-**6. Verify**
-
-```bash
-# Check health
-curl http://localhost:8080/actuator/health
-
-# Should return: {"status":"UP"...}
-```
-
-### Common Commands
-
-```bash
-# Run tests
-mvn test
-
-# Build package
-mvn clean package
-
-# Run with profile
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-
-# Skip tests
-mvn clean install -DskipTests
-```
-
-## 📚 Documentation
-
-| Document                                      | Description                             |
-| --------------------------------------------- | --------------------------------------- |
-| [📖 Developer Guide](docs/DEVELOPER_GUIDE.md) | Local setup, debugging, daily workflows |
-| [📘 Technical Reference](docs/TECHNICAL.md)   | Architecture, security, monitoring      |
-| [🤝 Contributing](docs/CONTRIBUTING.md)       | Contribution guidelines and workflow    |
-
-**API Documentation**: See `.dapr/README.md` for Dapr configuration and `src/main/java/com/xshopai/orderprocessor/` for endpoint definitions.
-
-## ⚙️ Configuration
-
-### Required Environment Variables
-
-```bash
-# Service
-SPRING_PROFILES_ACTIVE=development
-SERVER_PORT=8080
-
-# Database
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/order_processor_db
-SPRING_DATASOURCE_USERNAME=postgres
-SPRING_DATASOURCE_PASSWORD=postgres
-
-# JWT
-JWT_SECRET=your-secret-key-min-32-characters
-
-# Dapr
-DAPR_HTTP_PORT=3500
-DAPR_GRPC_PORT=50001
-DAPR_APP_ID=order-processor-service
-```
-
-> **Note:** All services now use the standard Dapr ports (3500 for HTTP, 50001 for gRPC). This simplifies configuration and works consistently whether running via Docker Compose or individual service runs.
-
-See [application.properties](src/main/resources/application.properties) for complete configuration options.
+---
 
 ## ✨ Key Features
 
+<table>
+<tr>
+<td width="50%">
+
+### 🔄 Saga Orchestration
+
 - Choreography-based saga pattern
 - Distributed transaction coordination
+- Automatic compensation on failure
+- Eventually consistent transactions
+
+</td>
+<td width="50%">
+
+### 📡 Event-Driven Processing
+
 - Event sourcing for order processing
-- Compensation logic for failed transactions
-- Integration with payment, inventory, and shipping services
+- Dapr pub/sub integration (RabbitMQ)
 - Idempotency and retry mechanisms
 - Comprehensive event logging
-- Spring Boot 3.x with Java 21
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 🗄️ Data Management
+
+- PostgreSQL with Spring Data JPA
+- Flyway database migrations
+- Spring Actuator health checks
+- Structured event storage
+
+</td>
+<td width="50%">
+
+### 🛡️ Enterprise Security
+
+- JWT authentication (Spring Security)
+- Service-to-service token validation
+- OpenTelemetry distributed tracing
+- Spring Boot Actuator monitoring
+
+</td>
+</tr>
+</table>
+
+---
 
 ## 🏗️ Architecture
 
@@ -148,18 +91,240 @@ Order Created → Payment → Inventory → Shipping → Order Completed
 - Automatic compensation on failure
 - Eventually consistent transactions
 
-## 🔗 Related Services
+---
 
-- [order-service](https://github.com/xshopai/order-service) - Order management
-- [payment-service](https://github.com/xshopai/payment-service) - Payment processing
-- [inventory-service](https://github.com/xshopai/inventory-service) - Inventory management
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Java JDK 17+
+- Maven 3.9+
+- PostgreSQL 12+
+- Docker & Docker Compose (optional)
+- Dapr CLI (for production-like setup)
+
+### Quick Start with Docker Compose
+
+```bash
+# Clone the repository
+git clone https://github.com/xshopai/order-processor-service.git
+cd order-processor-service
+
+# Start PostgreSQL + service
+docker-compose up -d
+
+# Verify the service is healthy
+curl http://localhost:8007/actuator/health
+```
+
+### Local Development Setup
+
+<details>
+<summary><b>🔧 Without Dapr (Simple Setup)</b></summary>
+
+```bash
+# Start PostgreSQL
+docker-compose -f docker-compose.db.yml up -d
+
+# Build the project
+mvn clean install
+
+# Run with Spring profile
+mvn spring-boot:run -Dspring-boot.run.profiles=direct
+```
+
+📖 See [Local Development Guide](docs/LOCAL_DEVELOPMENT.md) for detailed instructions.
+
+</details>
+
+<details>
+<summary><b>⚡ With Dapr (Production-like)</b></summary>
+
+```bash
+# Ensure Dapr is initialized
+dapr init
+
+# Start with Dapr sidecar
+./run.sh       # Linux/Mac
+.\run.ps1      # Windows
+
+# Or manually
+dapr run \
+  --app-id order-processor-service \
+  --app-port 8007 \
+  --dapr-http-port 3500 \
+  --resources-path .dapr/components \
+  --config .dapr/config.yaml \
+  -- mvn spring-boot:run -Dspring-boot.run.profiles=dapr
+```
+
+> **Note:** All services now use the standard Dapr ports (3500 for HTTP, 50001 for gRPC).
+
+</details>
+
+---
+
+## 📚 Documentation
+
+| Document                                          | Description                                        |
+| :------------------------------------------------ | :------------------------------------------------- |
+| 📘 [Local Development](docs/LOCAL_DEVELOPMENT.md) | Step-by-step local setup and development workflows |
+| ☁️ [Azure Container Apps](docs/ACA_DEPLOYMENT.md) | Deploy to serverless containers with built-in Dapr |
+
+---
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+mvn test
+
+# Build without tests
+mvn clean install -DskipTests
+
+# Run with specific profile
+mvn test -Dspring.profiles.active=test
+
+# Package for deployment
+mvn clean package
+```
+
+### Test Coverage
+
+| Metric        | Status              |
+| :------------ | :------------------ |
+| Unit Tests    | ✅ JUnit 5          |
+| Integration   | ✅ Spring Boot Test |
+| Security Scan | ✅ Spring Security  |
+
+---
+
+## 🏗️ Project Structure
+
+```
+order-processor-service/
+├── 📁 src/
+│   ├── 📁 main/
+│   │   ├── 📁 java/com/xshopai/orderprocessor/
+│   │   │   ├── 📁 config/         # Spring configuration
+│   │   │   ├── 📁 controller/     # REST controllers
+│   │   │   ├── 📁 model/          # JPA entities
+│   │   │   ├── 📁 repository/     # Spring Data JPA repos
+│   │   │   ├── 📁 service/        # Business logic (saga)
+│   │   │   ├── 📁 event/          # Event handling
+│   │   │   └── 📁 security/       # JWT + Spring Security
+│   │   └── 📁 resources/
+│   │       ├── 📄 application.yml  # Default config
+│   │       ├── 📄 application-dapr.yml
+│   │       └── 📄 application-direct.yml
+│   └── 📁 test/                    # Test suite
+├── 📁 docs/                        # Documentation
+├── 📁 scripts/                     # Utility scripts
+├── 📁 .dapr/                       # Dapr configuration
+│   ├── 📁 components/              # Pub/sub, state store configs
+│   └── 📄 config.yaml              # Dapr runtime configuration
+├── 📄 docker-compose.yml           # Full service stack
+├── 📄 docker-compose.db.yml        # PostgreSQL only
+├── 📄 Dockerfile                   # Production container image
+└── 📄 pom.xml                      # Maven dependencies
+```
+
+---
+
+## 🔧 Technology Stack
+
+| Category          | Technology                                       |
+| :---------------- | :----------------------------------------------- |
+| ☕ Runtime        | Java 17+ (JDK 21 in Docker)                      |
+| 🌐 Framework      | Spring Boot 3.3 with Spring Security             |
+| 🗄️ Database       | PostgreSQL 12+ with Spring Data JPA + Flyway     |
+| 📨 Messaging      | Dapr Pub/Sub (RabbitMQ) + Dapr SDK               |
+| 🔐 Authentication | JWT Tokens + Spring Security                     |
+| 🧪 Testing        | JUnit 5 + Spring Boot Test                       |
+| 📊 Observability  | Spring Actuator + OpenTelemetry + Lombok logging |
+
+---
+
+## ⚡ Quick Reference
+
+```bash
+# 🐳 Docker Compose
+docker-compose up -d              # Start all services
+docker-compose down               # Stop all services
+docker-compose -f docker-compose.db.yml up -d  # PostgreSQL only
+
+# ☕ Local Development
+mvn spring-boot:run               # Run (default profile)
+mvn spring-boot:run -Dspring-boot.run.profiles=dev  # Dev profile
+
+# ⚡ Dapr Development
+./run.sh                          # Linux/Mac
+.\run.ps1                         # Windows
+
+# 🧪 Testing
+mvn test                          # Run all tests
+mvn clean package                 # Build JAR
+
+# 🔍 Health Check
+curl http://localhost:8007/actuator/health
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. **Fork** the repository
+2. **Create** a feature branch
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **Write** tests for your changes
+4. **Run** the test suite
+   ```bash
+   mvn test
+   ```
+5. **Commit** your changes
+   ```bash
+   git commit -m 'feat: add amazing feature'
+   ```
+6. **Push** to your branch
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+7. **Open** a Pull Request
+
+Please ensure your PR:
+
+- ✅ Passes all existing tests
+- ✅ Includes tests for new functionality
+- ✅ Follows the existing code style
+- ✅ Updates documentation as needed
+
+---
+
+## 🆘 Support
+
+| Resource         | Link                                                                                 |
+| :--------------- | :----------------------------------------------------------------------------------- |
+| 🐛 Bug Reports   | [GitHub Issues](https://github.com/xshopai/order-processor-service/issues)           |
+| 📖 Documentation | [docs/](docs/)                                                                       |
+| 💬 Discussions   | [GitHub Discussions](https://github.com/xshopai/order-processor-service/discussions) |
+
+---
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE)
+This project is part of the **xshopai** e-commerce platform.
+Licensed under the MIT License - see [LICENSE](LICENSE) for details.
 
-## 📞 Support
+---
 
-- **Issues**: [GitHub Issues](https://github.com/xshopai/order-processor-service/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/xshopai/order-processor-service/discussions)
-- **Documentation**: [docs/](docs/)
+<div align="center">
+
+**[⬆ Back to Top](#-order-processor-service)**
+
+Made with ❤️ by the xshopai team
+
+</div>
