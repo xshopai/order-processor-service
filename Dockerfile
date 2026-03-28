@@ -5,7 +5,7 @@
 # -----------------------------------------------------------------------------
 # Maven Cache stage - Download dependencies only when pom.xml changes
 # -----------------------------------------------------------------------------
-FROM eclipse-temurin:21-jdk-alpine AS maven-cache
+FROM eclipse-temurin:25-jdk-alpine AS maven-cache
 WORKDIR /app
 
 # Install Maven (use built-in Maven for faster builds)
@@ -36,7 +36,7 @@ RUN mvn clean package -DskipTests=true -B --no-transfer-progress \
 # -----------------------------------------------------------------------------
 # Runtime base - Optimized JRE image
 # -----------------------------------------------------------------------------
-FROM eclipse-temurin:21-jre-alpine AS runtime-base
+FROM eclipse-temurin:25-jre-alpine AS runtime-base
 
 # Install only essential system dependencies and wget for healthcheck
 RUN apk add --no-cache \
