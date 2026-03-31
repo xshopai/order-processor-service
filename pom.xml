@@ -22,7 +22,7 @@
         <lombok.version>1.18.38</lombok.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
         <micrometer.version>1.13.1</micrometer.version>
-        <dapr.version>1.12.0</dapr.version>
+        <dapr.version>1.16.0</dapr.version>
     </properties>
 
     <dependencies>
